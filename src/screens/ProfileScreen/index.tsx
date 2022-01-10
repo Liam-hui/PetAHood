@@ -31,7 +31,6 @@ const Header = () => {
           <Icon
             icon={require(`../../assets/icons/icon-backArrow.png`)}
             size={24}
-
             onPress={() => navigation.dispatch(popAction) }
           />
           <Icon

@@ -3,7 +3,7 @@ import { View, ImageSourcePropType } from 'react-native';
 import Icon from '@/components/Icon';
 import { SvgUri } from 'react-native-svg';
 
-import { HeadingText, Banner, FeaturesListContainer, FeatureLabel, FeatureContainer } from './styles';
+import { HeadingText } from './styles';
 
 export default function Heading({ icon, svgIcon, text, style }: { icon?: ImageSourcePropType, svgIcon?: string, text: string, style?: object }) {
   return (

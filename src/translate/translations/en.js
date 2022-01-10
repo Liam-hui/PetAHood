@@ -5,4 +5,12 @@ export default {
   drawerItem_message: "Direct Message",
   drawerItem_party: "Create Pet's Party",
   drawerItem_setting: "Settings",
+
+  shopDetails_mon: "Monday",
+  shopDetails_tue: "Tuesday",
+  shopDetails_wed: "Wednesday",
+  shopDetails_thu: "Thursday",
+  shopDetails_fri: "Friday",
+  shopDetails_sat: "Saturday",
+  shopDetails_sun: "Sunday",
 };

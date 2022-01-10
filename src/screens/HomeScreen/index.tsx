@@ -1,21 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { View, Image, Text, ScrollView, ImageSourcePropType, TouchableOpacity } from 'react-native';
-import { useWindowDimensions } from 'react-native';
+import { View, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaInsetsContext } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
-import { DrawerActions } from '@react-navigation/native';
-import { BlurView } from 'expo-blur';
+import { useNavigation, DrawerActions } from '@react-navigation/native';
 
 import { RootState } from '@/store';
 import { useAppSelector, useAppDispatch } from '@/hooks';
 import { getHomePageData } from '@/store/homePageData';
-import Heading from './Heading';
 import Banners from './Banners';
+import Features from './Features';
 import Places from './Places';
 import Inspirations from './Inspirations';
-import Icon from '../../components/Icon';
-import SearchBar from '../../components/SearchBar';
-import { Banner, FeaturesListContainer, FeatureLabel, FeatureContainer } from './styles';
+import Icon from '@/components/Icon';
+import SearchBar from '@/components/SearchBar';
+import { Banner } from './styles';
 
 export default function HomeScreen() {
 
@@ -31,7 +28,7 @@ export default function HomeScreen() {
       <Header/>
       <ScrollView>
         <Banners data={homePageData.banners} />
-        <FeaturesList />
+        <Features />
         <Places data={homePageData.sliders} />
 
         <View style={{ paddingHorizontal: 15, paddingVertical: 20, backgroundColor: "white" }}>
@@ -59,7 +56,9 @@ const Header = () => {
         />
         <SearchBar 
           value={searchText}
+          placeholder="Search..."
           onChangeText={setSearchText}
+          onSubmit={() => navigation.navigate('Search')}
           style={{ flex: 1, marginHorizontal: 5 }}
         />
         <Icon
@@ -78,74 +77,3 @@ const Header = () => {
     </SafeAreaInsetsContext.Consumer>
   );
 }
-
-const FeaturesList = () => {
-  const { width } = useWindowDimensions();
-
-  const FeatureItem = ({ label, icon, onPress }: { label: string, icon: ImageSourcePropType, onPress: () => void }) => {
-    return (
-      <FeatureContainer style={{ width: (width - 15) / 4 - 15, marginRight: 15 }} onPress={onPress} activeOpacity={0.6} >
-        <Image 
-          style={{ height: 32, marginBottom: 5 }}
-          resizeMode="contain"
-          source={icon} 
-        />
-        <FeatureLabel>{label}</FeatureLabel>
-      </FeatureContainer>
-    )
-  }
-  return (
-    <FeaturesListContainer style={{ paddingLeft: 15 }}>
-      <FeatureItem
-        label="Member Offers"
-        icon={require("../../assets/icons/icon-features-offers.png")} 
-        onPress={() => {}}
-      />
-      <FeatureItem
-        label="Ticketing"
-        icon={require("../../assets/icons/icon-features-ticket.png")} 
-        onPress={() => {}}
-      />
-      <FeatureItem
-        label="Deals"
-        icon={require("../../assets/icons/icon-features-deals.png")} 
-        onPress={() => {}}
-      />
-      <FeatureItem
-        label="Event"
-        icon={require("../../assets/icons/icon-features-event.png")} 
-        onPress={() => {}}
-      />
-      <FeatureItem
-        label="Add New Location"
-        icon={require("../../assets/icons/icon-features-newLocation.png")} 
-        onPress={() => {}}
-      />
-      <FeatureItem
-        label="Finding Friends"
-        icon={require("../../assets/icons/icon-features-findFriends.png")} 
-        onPress={() => {}}
-      />
-      <FeatureItem
-        label="Create Pet’s Party"
-        icon={require("../../assets/icons/icon-features-party.png")} 
-        onPress={() => {}}
-      />
-    </FeaturesListContainer>
-  );
-}
-
-const places = [
-  {
-    id: "1",
-    name: "asdfasdf"
-  },
-  {
-    id: "2",
-    name: "West Kowloon Waterfron"
-  },
-  {
-    id: "3",
-    name: "West Kowloon Waterfront Promenaasdfasdfasdf"
-  }
-]

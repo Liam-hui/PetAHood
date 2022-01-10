@@ -2,6 +2,7 @@ import React from 'react';
 import { store } from '@/store';
 import { Provider } from 'react-redux';
 import '@/translate/i18n';
+
 // import { StatusBar } from 'expo-status-bar';
 // import { SafeAreaProvider } from 'react-native-safe-area-context';
 

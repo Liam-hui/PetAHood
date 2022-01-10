@@ -1,11 +1,13 @@
 import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
 import counterReducer from './counter';
 import homePageDataReducer from './homePageData';
+import shopDetailsReducer from './shopDetails';
 
 export const store = configureStore({
   reducer: {
     counter: counterReducer,
     homePageData: homePageDataReducer,
+    shopDetails: shopDetailsReducer,
   },
 });
 
