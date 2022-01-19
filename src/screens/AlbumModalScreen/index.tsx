@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Image, SafeAreaView, TouchableOpacity, ScrollView  } from 'react-native';
+import { View, SafeAreaView, TouchableOpacity, ScrollView  } from 'react-native';
 import Carousel from 'react-native-snap-carousel';
+import FastImage from 'react-native-fast-image'
 
 import { RootStackScreenProps } from '@/types';
 import Layout from '@/constants/Layout';
@@ -13,9 +14,20 @@ export default function AlbumModalScreen(props: RootStackScreenProps<'AlbumModal
   const scrollRef = useRef<ScrollView | null>(null);
   const [scrollXPos, setScrollXPos] = useState(0);
 
+  useEffect(() => {
+    setTimeout(() => {
+      if (index)
+        scrollRef.current!.scrollTo({
+          x: index * 100,
+          y: 0,
+          animated: true,
+        });
+    }, 100)
+  }, [])
+
   const renderItem = ({ item } : { item: any }) => {
     return (
-      <Image 
+      <FastImage
         style={{ width: "100%", height: "100%" }} 
         source={{ uri: item }}
         resizeMode="contain"
@@ -25,7 +37,7 @@ export default function AlbumModalScreen(props: RootStackScreenProps<'AlbumModal
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "black" }}>
-      <View style={{ flex: 1 }}>
+      <View style={{ flex: 1, paddingVertical: 15 }}>
         <Carousel
           firstItem={index ?? 0}
           ref={(c) => { carouselRef.current = c; }}
@@ -66,12 +78,13 @@ export default function AlbumModalScreen(props: RootStackScreenProps<'AlbumModal
         >
           {images.map((image: any, index) => 
             <TouchableOpacity 
+              key={index}
               style={{ width: 100, paddingHorizontal: 5 }} 
               activeOpacity={0.5}
               onPress={() => carouselRef.current!.snapToItem(index, true) }
             >
-              <Image 
-                style={{ width: "100%", height: "100%", opacity: index == activeIndex ? 1 : 0.5 }} 
+              <FastImage
+                style={{ width: "100%", height: "100%", opacity: index == activeIndex ? 1 : 0.25 }} 
                 source={{ uri: image }}
               /> 
             </TouchableOpacity>

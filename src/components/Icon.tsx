@@ -16,6 +16,7 @@ export default function Icon({ icon, size, onPress, style }: { icon: ImageSource
       style={{ height: size, width: size, ...style! }}
       resizeMode="contain"
       source={icon} 
+      // defaultSource={}
     />  
   );
 }

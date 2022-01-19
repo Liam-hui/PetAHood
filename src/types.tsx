@@ -15,7 +15,9 @@ export type RootStackParamList = {
   NotFound: undefined;
   Profile: undefined,
   Search: undefined,
+  SearchResult: undefined,
   ShopDetail: { id: number },
+  Blog: { url: string }
   AlbumModal: { images: any[], index?: number }
 };
 

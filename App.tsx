@@ -1,6 +1,7 @@
 import React from 'react';
-import { store } from '@/store';
+import { store, persistor } from '@/store';
 import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react'
 import '@/translate/i18n';
 
 // import { StatusBar } from 'expo-status-bar';
@@ -19,7 +20,9 @@ export default function App() {
   } 
   else return (
     <Provider store={store}>
-      <Navigation colorScheme={colorScheme} />
+      <PersistGate loading={null} persistor={persistor}>
+        <Navigation colorScheme={colorScheme} />
+      </PersistGate>
       {/* <StatusBar /> */}
     </Provider>
   );

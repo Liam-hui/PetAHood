@@ -3,9 +3,13 @@ import { View, Image, TouchableOpacity } from 'react-native';
 import Layout from '@/constants/Layout';
 import Colors from '@/constants/Colors';
 import Carousel, { Pagination } from 'react-native-snap-carousel';
-import Heading from './Heading';
+// import { BlurView } from 'expo-blur';
+import { VibrancyView } from "@react-native-community/blur";
 
+import Heading from './Heading';
 import { InspirationContainer, InspirationText } from './styles';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 export default function Inspirations({ data }: { data: any[] }) {
 
@@ -70,15 +74,33 @@ export default function Inspirations({ data }: { data: any[] }) {
 }
 
 const Inspiration = ({ item, style }: { item: any, style?: object }) => {
-  console.log(item.image);
+  
+  const navigation = useNavigation<NativeStackNavigationProp<any>>();
+
   return (
-    <InspirationContainer as={TouchableOpacity} activeOpacity={0.6} style={style!} >
+    <InspirationContainer 
+      as={TouchableOpacity} 
+      activeOpacity={0.6} 
+      style={style!} 
+      onPress={() => navigation.push("Blog", { url: item.url })}
+    >
       <Image 
         style={{ width: "100%", height: "100%", position: "absolute" }}
         resizeMode="cover"
-        source={require('../../assets/images/place.jpg')} 
+        source={require('../../assets/images/banner.png')} 
         // source={{ uri: item.image }} 
       />
+      {/* <BlurView
+        style={{ position: "absolute", top: 0, left: 0, bottom: 0, right: 0 }}
+        intensity={100}
+        // tint="dark"
+      /> */}
+      {/* <VibrancyView
+        style={{ position: "absolute", top: 0, left: 0, bottom: 0, right: 0 }}
+        // blurAmount={10}
+        blurType='dark'
+        blurRadius={20}
+      /> */}
       <InspirationText>{item.title}</InspirationText>
     </InspirationContainer>
   );

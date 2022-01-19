@@ -8,7 +8,7 @@ export default function WideButton({ text, onPress, style }: { text: string, onP
       onPress={onPress}
       activeOpacity={0.6}
       style={{
-        width: "100%",
+        // width: "100%",
         height: 55,
         borderRadius: 8,
         alignItems: "center",

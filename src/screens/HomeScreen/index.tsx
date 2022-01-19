@@ -27,6 +27,7 @@ export default function HomeScreen() {
     <View style={{ flex: 1, backgroundColor: "#E5E5E5" }}>
       <Header/>
       <ScrollView>
+        
         <Banners data={homePageData.banners} />
         <Features />
         <Places data={homePageData.sliders} />
@@ -43,7 +44,6 @@ export default function HomeScreen() {
 
 const Header = () => {
   const navigation = useNavigation();
-  const [searchText, setSearchText] = useState("");
 
   return (
     <SafeAreaInsetsContext.Consumer>
@@ -55,11 +55,11 @@ const Header = () => {
           onPress={() => navigation.dispatch(DrawerActions.openDrawer()) }
         />
         <SearchBar 
-          value={searchText}
+          value={""}
           placeholder="Search..."
-          onChangeText={setSearchText}
-          onSubmit={() => navigation.navigate('Search')}
           style={{ flex: 1, marginHorizontal: 5 }}
+          isTextDisabled
+          select={() => navigation.navigate('Search')}
         />
         <Icon
           icon={require(`../../assets/icons/icon-cart.png`)}

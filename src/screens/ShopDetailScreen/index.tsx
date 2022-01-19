@@ -3,6 +3,7 @@ import { View, Image, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaInsetsContext } from 'react-native-safe-area-context';
 import { useTranslation } from "react-i18next";
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import FastImage from 'react-native-fast-image'
 import moment from 'moment';
 
 import { Text } from '@/components/Themed';
@@ -18,6 +19,7 @@ import Colors from '@/constants/Colors';
 
 import { InfoRow, InfoText, Card, Sep, Section, Heading } from './styles';
 import Layout from '@/constants/Layout';
+import Header from '@/components/Header';
 
 export default function ShopDetailScreen(props: RootStackScreenProps<'ShopDetail'>) {
 
@@ -29,27 +31,16 @@ export default function ShopDetailScreen(props: RootStackScreenProps<'ShopDetail
 
   useEffect(() => {
     dispatch(getShopDetailById(id));
-    console.log(data);
   }, [])
+
+  useEffect(() => {
+    console.log(data);
+  }, [data])
 
   return (
     <View style={{ flex: 1, backgroundColor: "#E5E5E5" }}>
 
-      {/* header */}
-      <SafeAreaInsetsContext.Consumer>
-        {insets => <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingBottom: 10, backgroundColor: "white", paddingHorizontal: 15, paddingTop: 13 + (insets?.top ?? 0) }} >
-          <Icon
-            icon={require(`../../assets/icons/icon-backArrow.png`)}
-            size={24}
-            onPress={() => navigation.pop() }
-          />
-          {/* <Image 
-            style={{ height: 40 }}
-            resizeMode="contain"
-            source={require('../../assets/images/logo.png')} 
-          /> */}
-        </View>}
-      </SafeAreaInsetsContext.Consumer>
+      <Header/>
 
       {data && <>
         <ScrollView
@@ -60,10 +51,10 @@ export default function ShopDetailScreen(props: RootStackScreenProps<'ShopDetail
             <TouchableOpacity 
               style={{ width: Layout.window.width * 2 / 3,  height: Layout.window.width * 2 / 3, paddingRight: 2 }}  
               onPress={() => {
-                navigation.push("AlbumModal", { images: [data.cover_image, data.albums, data.albums, data.albums, data.albums, data.albums, data.albums] });
+                navigation.push("AlbumModal", { images: [data.cover_image] });
               }}
             >
-              <Image 
+              <FastImage 
                 style={{ width: "100%", height: "100%" }} 
                 source={{ uri: data.cover_image }}
               />
@@ -75,9 +66,9 @@ export default function ShopDetailScreen(props: RootStackScreenProps<'ShopDetail
                   navigation.push("AlbumModal", { images: [] });
                 }}
               >
-                <Image 
+                <FastImage 
                   style={{ width: "100%", height: "100%"  }} 
-                  source={{ uri: data.albums }}
+                  source={{ uri: data.cover_image }}
                 />
               </TouchableOpacity >
               <TouchableOpacity  
@@ -86,9 +77,9 @@ export default function ShopDetailScreen(props: RootStackScreenProps<'ShopDetail
                   navigation.push("AlbumModal", { images: [] });
                 }}
               >
-                <Image 
+                <FastImage 
                   style={{ width: "100%", height: "100%"  }} 
-                  source={{ uri: data.albums }}
+                  source={{ uri: data.cover_image }}
                 />
               </TouchableOpacity >
             </View>

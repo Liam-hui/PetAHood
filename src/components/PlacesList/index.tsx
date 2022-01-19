@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { View, Text, FlatList, Image } from 'react-native';
+import FastImage from 'react-native-fast-image'
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
@@ -52,7 +53,7 @@ const Place = ({ item }: { item: any }) => {
         }}
         onPress={() => navigation.push("ShopDetail", { id: item.id })}
       >
-        <Image 
+        <FastImage
           style={{ width: "100%", height: "50%" }}
           resizeMode="cover"
           source={{ uri: item.cover_image }} 
