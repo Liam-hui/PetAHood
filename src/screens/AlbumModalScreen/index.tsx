@@ -45,6 +45,7 @@ export default function AlbumModalScreen(props: RootStackScreenProps<'AlbumModal
           renderItem={renderItem}
           sliderWidth={Layout.window.width}
           itemWidth={Layout.window.width}
+          removeClippedSubviews={false}
           onSnapToItem={(index) => {
             const pos = index * 100;
             if ((pos - 20) < scrollXPos) {

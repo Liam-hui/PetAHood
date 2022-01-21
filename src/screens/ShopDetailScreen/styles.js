@@ -16,8 +16,7 @@ export const Sep = styled.View`
 `;
 
 export const Section = styled.View`
-  padding-horizontal: 20px;
-  margin-vertical: 10px;
+  margin-vertical: 20px;
 `;
 
 export const Heading = styled.Text`
@@ -28,11 +27,12 @@ export const Heading = styled.Text`
 export const InfoRow = styled.View`
   flex-direction: row;
   align-items: center;
-  margin-vertical: 8px;
+  margin-vertical: 12px;
 `;
 
 export const InfoText = styled.Text`
+  flex: 1;
   margin-left: 10px;
   font-size: 14px;
-  line-height: 25px;
+  line-height: 18px;
 `;

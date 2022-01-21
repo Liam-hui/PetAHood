@@ -10,6 +10,7 @@ import '@/translate/i18n';
 import useCachedResources from '@/hooks/useCachedResources';
 import useColorScheme from '@/hooks/useColorScheme';
 import Navigation from '@/navigation';
+import Loading from '@/components/Loading';
 
 export default function App() {
   const isLoadingComplete = useCachedResources();
@@ -22,6 +23,7 @@ export default function App() {
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <Navigation colorScheme={colorScheme} />
+        <Loading/>
       </PersistGate>
       {/* <StatusBar /> */}
     </Provider>

@@ -18,6 +18,7 @@ export default function Banners({ data }: { data: any[] }) {
       sliderWidth={Layout.window.width}
       itemWidth={Layout.window.width}
       inactiveSlideScale={1}
+      removeClippedSubviews={false}
     />
   );
 }

@@ -2,38 +2,32 @@ import React, { useState, useEffect } from 'react';
 import { View, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaInsetsContext } from 'react-native-safe-area-context';
 import { useNavigation, DrawerActions } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 
 import { RootState } from '@/store';
-import { useAppSelector, useAppDispatch } from '@/hooks';
-import { getHomePageData } from '@/store/homePageData';
+import { useAppSelector } from '@/hooks';
 import Banners from './Banners';
-import Features from './Features';
-import Places from './Places';
+import Buttons from './Buttons';
+import Shops from './Shops';
 import Inspirations from './Inspirations';
 import Icon from '@/components/Icon';
 import SearchBar from '@/components/SearchBar';
-import { Banner } from './styles';
+import Colors from '@/constants/Colors';
 
 export default function HomeScreen() {
 
-  const dispatch = useAppDispatch();
   const homePageData = useAppSelector((state: RootState) => state.homePageData);
 
-  useEffect(() => {
-    dispatch(getHomePageData());
-  }, [])
-
   return (
-    <View style={{ flex: 1, backgroundColor: "#E5E5E5" }}>
+    <View style={{ flex: 1, backgroundColor: Colors.lightBlue }}>
       <Header/>
       <ScrollView>
         
         <Banners data={homePageData.banners} />
-        <Features />
-        <Places data={homePageData.sliders} />
-
-        <View style={{ paddingHorizontal: 15, paddingVertical: 20, backgroundColor: "white" }}>
-          <Banner source={require(`../../assets/images/banner.png`)} />
+        <Buttons data={homePageData.buttons} />
+        <Shops data={homePageData.sliders} />
+        <View style={{ paddingVertical: 20, backgroundColor: "white" }}>
+          {/* <Banner source={require(`../../assets/images/banner.png`)} /> */}
           <Inspirations data={homePageData.blogs} />
         </View>
 
@@ -43,6 +37,7 @@ export default function HomeScreen() {
 }
 
 const Header = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation();
 
   return (
@@ -56,7 +51,7 @@ const Header = () => {
         />
         <SearchBar 
           value={""}
-          placeholder="Search..."
+          placeholder={t("home_search")}
           style={{ flex: 1, marginHorizontal: 5 }}
           isTextDisabled
           select={() => navigation.navigate('Search')}

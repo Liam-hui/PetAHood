@@ -1,35 +1,61 @@
 import api from '@/api';
 
-export async function getHomePageBannersApi() {
-  let banners: Object[] | null = null;
+export async function getHomePageButtonsApi() {
   try {
-    const { data } = await api.get('/resources/home/banners');
-    banners = data.payload;
+    const { data } = await api.get('/resources/home/app_btns');
+    return {
+      isSuccess: true,
+      data: data.payload,
+    }
   } catch (error) {
     console.log(error);
+    return {
+      isSuccess: false
+    }
   }
-  return banners;
+}
+
+export async function getHomePageBannersApi() {
+  try {
+    const { data } = await api.get('/resources/home/banners');
+    return {
+      isSuccess: true,
+      data: data.payload,
+    }
+  } catch (error) {
+    console.log(error);
+    return {
+      isSuccess: false
+    }
+  }
 }
 
 export async function getHomePageSlidersApi() {
-  let sliders: Object[] | null = null;
   try {
     const { data } = await api.get('/resources/home/sliders');
-    sliders = data.payload;
+    return {
+      isSuccess: true,
+      data: data.payload,
+    }
   } catch (error) {
     console.log(error);
+    return {
+      isSuccess: false
+    }
   }
-  return sliders;
 }
 
 export async function getHomePageBlogsApi() {
-  let blogs: Object[] | null = null;
   try {
     const { data } = await api.get('/resources/home/blogs');
-    blogs = data.payload;
+    return {
+      isSuccess: true,
+      data: data.payload,
+    }
   } catch (error) {
     console.log(error);
+    return {
+      isSuccess: false
+    }
   }
-  return blogs;
 }
-

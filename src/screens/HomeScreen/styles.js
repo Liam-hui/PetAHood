@@ -9,7 +9,7 @@ export const Banner = styled.Image`
   width: 100%;
 `;
 
-export const FeaturesListContainer = styled.View`
+export const ButtonsContainer = styled.View`
   width: 100%;
   flex-direction: row;
   flex-wrap: wrap;
@@ -17,7 +17,7 @@ export const FeaturesListContainer = styled.View`
 `;
 
 
-export const FeatureContainer = styled.TouchableOpacity`
+export const ButtonContainer = styled.TouchableOpacity`
   background-color: white;
   width: 74px;
   height: 96px;
@@ -30,7 +30,7 @@ export const FeatureContainer = styled.TouchableOpacity`
 `;
 
 
-export const FeatureLabel = styled.Text`
+export const ButtonLabel = styled.Text`
   font-size: 14px;
   font-weight: bold;
   line-height: 19px;
@@ -48,5 +48,6 @@ export const InspirationText = styled.Text`
   font-size: 18px;
   font-weight: bold;
   color: white;
+  margin-horizontal: 10px;
 `;
 

@@ -24,7 +24,7 @@ export default function SearchBar({ value, placeholder, onChangeText, onSubmit, 
       <View style={{ flex: 1 }}>
         <TextInput
           ref={inputRef?? null}
-          style={{ flex: 1, height: "100%", fontSize: 16 }}
+          style={{ flex: 1, height: "100%", fontSize: 16, color: "black" }}
           placeholder={placeholder}
           placeholderTextColor="#999999"
           onChangeText={onChangeText}
@@ -50,7 +50,7 @@ export default function SearchBar({ value, placeholder, onChangeText, onSubmit, 
         ? <Icon
             icon={require(`../assets/icons/icon-close.png`)}
             size={12}
-            style={{ marginHorizontal: 5, zIndex: 10 }}
+            style={{ zIndex: 10, paddingHorizontal: 9, paddingVertical: 4 }}
             onPress={() => {
               Keyboard.dismiss();
               unselect && unselect();
@@ -59,7 +59,7 @@ export default function SearchBar({ value, placeholder, onChangeText, onSubmit, 
         : <Icon
             icon={require(`../assets/icons/icon-search.png`)}
             size={16}
-            style={{ marginHorizontal: 5  }}
+            style={{ paddingHorizontal: 5 }}
             onPress={onSubmit ?? select}
           />
       }

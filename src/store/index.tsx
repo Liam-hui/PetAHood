@@ -12,24 +12,28 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import counterReducer from './counter';
+import loadingReducer from './loading';
 import homePageDataReducer from './homePageData';
 import shopDetailsReducer from './shopDetails';
 import shopSearchReducer from './shopSearch';
+import blogDetailsReducer from './blogDetails';
 
 const persistConfig = {
   key: 'root',
   version: 1,
   storage: AsyncStorage,
-  whitelist: ['homePageData', 'shopDetails', 'shopSearch']
+  whitelist: ['homePageData', 'shopDetails', 'shopSearch', 'blogDetails']
 };
 
 const persistedReducer = persistReducer(
   persistConfig, 
   combineReducers({
     counter: counterReducer,
+    loading: loadingReducer,
     homePageData: homePageDataReducer,
     shopDetails: shopDetailsReducer,
-    shopSearch: shopSearchReducer
+    shopSearch: shopSearchReducer,
+    blogDetails: blogDetailsReducer
   })
 )
 

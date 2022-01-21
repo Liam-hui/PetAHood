@@ -4,12 +4,11 @@ import FastImage from 'react-native-fast-image'
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-import { ShopItemLargeContainer, ShopItemContainer, ShopTitle } from './styles';
+import { ShopItemLargeContainer, ShopItemContainer, ShopTitle, ShopTitleLarge } from './styles';
 
 export function ShopItemLarge({ item, style }: { item: any, style?: any })  {
-
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
-  
+
   return (
     <View
       style={{
@@ -33,7 +32,7 @@ export function ShopItemLarge({ item, style }: { item: any, style?: any })  {
           resizeMode="cover"
           source={{ uri: item.cover_image }} 
         />
-        <View style={{ flex: 1, paddingHorizontal: 8, paddingVertical: 8 }}>
+        <View style={{ flex: 1, paddingHorizontal: 15, paddingVertical: 20 }}>
           <ShopTitle numberOfLines={2}>{item.name}</ShopTitle>
           <View style={{ flexDirection: "row" }}>
             <Image 
@@ -50,7 +49,6 @@ export function ShopItemLarge({ item, style }: { item: any, style?: any })  {
 }
 
 export function ShopItem({ item, style }: { item: any, style?: any })  {
-
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
   
   return (
@@ -63,14 +61,16 @@ export function ShopItem({ item, style }: { item: any, style?: any })  {
         },
         shadowOpacity: 0.1,
         shadowRadius: 5,
+        width: 144, 
+        height: 144,
         ...style
       }}
     >
       <ShopItemContainer
         activeOpacity={0.6}
         style={{ 
-          width: 144, 
-          height: 144,
+          width: "100%", 
+          height: "100%",
           backgroundColor: 'white',
           elevation: 2,
         }}
@@ -82,7 +82,7 @@ export function ShopItem({ item, style }: { item: any, style?: any })  {
           source={{ uri: item.cover_image }} 
         />
         <View style={{ flex: 1, paddingHorizontal: 8, paddingVertical: 8 }}>
-          <ShopTitle numberOfLines={2}>{item.name}</ShopTitle>
+          <ShopTitle numberOfLines={2} adjustsFontSizeToFit>{item.name}</ShopTitle>
           <View style={{ flexDirection: "row" }}>
             <Image 
               style={{ width: 14, height: 14, marginRight: 4 }}

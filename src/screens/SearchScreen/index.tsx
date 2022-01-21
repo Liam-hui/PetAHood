@@ -1,80 +1,85 @@
 import React, { useState, useEffect, useRef, createRef } from 'react';
-import { View, Image, Text, ScrollView, ImageSourcePropType, TouchableOpacity, TextInput, InteractionManager } from 'react-native';
-import { SafeAreaInsetsContext } from 'react-native-safe-area-context';
-import { useNavigation, StackActions } from '@react-navigation/native';
+import { View, Image, Text, ScrollView, TouchableOpacity, TextInput, ActivityIndicator } from 'react-native';
+import { useNavigation, StackActions, useIsFocused } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { RootState, store } from '@/store';
 import { useAppSelector, useAppDispatch } from '@/hooks';
 import Icon from '@/components/Icon';
 import SearchBar from '@/components/SearchBar';
-import { FilterMenu } from './FilterMenu';
-import { FilterParamType, filters, FilterType } from './filters';
 import Colors from '@/constants/Colors';
 import WideButton from '@/components/WideButton';
-import { getShopSearchResult } from '@/store/shopSearch';
+import { getShopQuickSearchResult, getShopSearchResult, resetShopQuickSearch, resetShopSearchFilter } from '@/store/shopSearch';
 import { FilterTab } from './FilterTab';
 
-import { BorderItem, BorderItemText, BorderItemWrapper } from './styles';
+import { NearBy, BorderItem, BorderItemText, BorderItemWrapper } from './styles';
+import { hideLoading, showLoading } from '@/store/loading';
+import { useTranslation } from 'react-i18next';
+import ShopList from '@/components/ShopList';
+import HotPicks from './HotPicks';
+import Layout from '@/constants/Layout';
 
 export default function SearchScreen() {
   
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
-
   const navigation = useNavigation();
   const popAction = StackActions.pop(1);
-
   const dispatch = useAppDispatch();
+  const isFocused = useIsFocused();
+
   const searchStatus = useAppSelector((state: RootState) => state.shopSearch.status);
   const [searchHistory, setSearchHistory] = useState([]);
-
+  
+  const [searchString, setSearchString] = useState("");
   const searchInputRef = createRef<TextInput>();
 
-  const [searchString, setSearchString] = useState("");
-  const [filter, setFilter] = useState<FilterType>({
-    region: [],
-    petType: [],
-    serviceType: [],
-    special: [],
-  });
+  const quickSearchStatus = useAppSelector((state: RootState) => state.shopSearch.quickSearchStatus);
+  const quickSearchResult = useAppSelector((state: RootState) => state.shopSearch.quickSearchResult);
+
+  const filter = useAppSelector((state: RootState) => state.shopSearch.filter);
+  const filterString = useAppSelector((state: RootState) => state.shopSearch.filterString);
   const filterCount = Object.values(filter).reduce(
     (prev, current) => {
       return prev + current.length
     }, 
     0
   );
-  const [filterString, setFilterString] = useState("");
   
-  const [isFilterOn, setIsFilterOn] = useState(false);
-  const [mode, setMode] = useState<null | string>(null);
+  const [mode, setMode] = useState<string | null>(null);
 
   useEffect(() => {
-    if (searchStatus == "idle") {
-    }
-    else if (searchStatus == "loading") {
-      // show loading
-    }
-    else if (searchStatus == "success") {
-      // hide loading
-      navigation.navigate("SearchResult");
-    }
-    else if (searchStatus == "failed") {
-      // hide loading
+    searchInputRef.current!.focus();
+
+    return resetFilter;
+  }, [])
+
+  useEffect(() => {
+    if (isFocused) {
+      if (searchStatus == "loading") {
+        dispatch(showLoading());
+      }
+      else if (searchStatus == "success") {
+        dispatch(hideLoading());
+        navigation.navigate("SearchResult");
+      }
+      else if (searchStatus == "failed") {
+        dispatch(hideLoading());
+      }
     }
   }, [searchStatus])
 
   useEffect(() => {
-    searchInputRef.current!.focus();
-  }, [])
-
-  useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
-
       // update search history only when screen comes into focus, prevent getting updated when navigate to search result screen
       setSearchHistory((store.getState() as any).shopSearch.history);
     });
     return unsubscribe;
   }, [navigation]);
+
+  useEffect(() => {
+    quickSearch();
+  }, [searchString])
 
   const search = () => {
     if (searchString != "" || filterCount > 0)
@@ -84,50 +89,29 @@ export default function SearchScreen() {
       }));
   }
 
-  const addFilter = (param: FilterParamType, value: number) => {
-    const index = filter[param].findIndex(x => x == value);
-    const label = filters[param].find(x => x.value == value)?.label;
-    if (index == -1) {
-      setFilter(
-        {
-          ...filter,
-          [param]: filter[param].concat(value)
-        }
-      )
-      setFilterString(filterString + (filterString == "" ? "" : ", ") + label);
-    }
+  const quickSearch = () => {
+    if (searchString != "")
+      dispatch(getShopQuickSearchResult({
+        searchString,
+      }));
     else {
-      setFilter(
-        {
-          ...filter,
-          [param]: filter[param].filter(x => x != value)
-        }
-      )
-      setFilterString(
-        filterString.replace(", " + label, "").replace(label + ", ", "").replace(label!, "")
-      );
+      dispatch(resetShopQuickSearch());
     }
   }
 
   const resetFilter = () => {
-    setFilter({
-      region: [],
-      petType: [],
-      serviceType: [],
-      special: [],
-    });
-    setFilterString("");
+    dispatch(resetShopSearchFilter());
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#E5E5E5" }}>
+    <View style={{ flex: 1, backgroundColor: Colors.lightBlue }}>
 
       {/* header */}
       <View 
         style={{ 
           flexDirection: "row", 
           alignItems: "center", 
-          justifyContent: "space-between", 
+          justifyContent: "center", 
           paddingBottom: 10, 
           backgroundColor: "white", 
           paddingHorizontal: 15, 
@@ -136,19 +120,21 @@ export default function SearchScreen() {
         <Icon
           icon={require(`../../assets/icons/icon-backArrow.png`)}
           size={24}
-          onPress={() => isFilterOn ? setIsFilterOn(false) : navigation.dispatch(popAction) }
+          style={{ position: "absolute" , left: 10, bottom: 15 }}
+          onPress={() => navigation.dispatch(popAction)}
+          // onPress={() => isFilterOn ? setIsFilterOn(false) : navigation.dispatch(popAction) }
         />
         <Image 
           style={{ height: 40 }}
           resizeMode="contain"
           source={require('../../assets/images/logo.png')} 
         />
-        <Icon
+        {/* <Icon
           icon={require(`../../assets/icons/icon-filter.png`)}
           size={24}
           onPress={isFilterOn ? undefined : () => setIsFilterOn(true) }
           style={{ opacity: isFilterOn ? 0 : 1}}
-        />
+        /> */}
       </View>
 
       <View style={{ flex: 1, paddingBottom: insets.bottom + 15 }}>
@@ -158,7 +144,7 @@ export default function SearchScreen() {
           <SearchBar 
             inputRef={searchInputRef}
             value={searchString}
-            placeholder="Shop name"
+            placeholder={t("search_shopName")}
             onChangeText={setSearchString}
             onSubmit={search}
             isSelected={mode == "search"}
@@ -172,9 +158,8 @@ export default function SearchScreen() {
           />
           <SearchBar 
             value={filterString}
-            placeholder="Location, Mall"
+            placeholder={t("search_filter")}
             isSelected={mode == "filter"}
-            onChangeText={() => setFilterString(filterString)}
             select={() => {
               setMode("filter");
             }}
@@ -187,43 +172,102 @@ export default function SearchScreen() {
           />
         </View>
 
-        {mode == "search" &&
+        {(mode == null || (mode == "search" && searchString == "")) &&
           <ScrollView
             contentContainerStyle={{
-              paddingHorizontal: 15,
-              paddingVertical: 15,
+              paddingVertical: 20,
             }}
           >
-        
-            {/* recent search */}
-            {searchHistory.length > 0 && <>
-              <Text style={{ color: Colors.darkBlue, fontSize: 14, fontWeight: "bold", marginBottom: 5 }}>
-                Recent Search History
-              </Text>
-              <BorderItemWrapper>
-                {searchHistory.map((item, index) => 
-                  <BorderItem as={TouchableOpacity}
-                    key={index}
-                    onPress={() => {
-                      dispatch(getShopSearchResult({
-                        searchString: item
-                      }));
-                    }}
-                  >
-                    <BorderItemText>{item}</BorderItemText>
-                  </BorderItem>
-                )}
-              </BorderItemWrapper>
-            </>}
+            <View style={{ paddingHorizontal: Layout.page.paddingHorizontal }}>
+              <NearBy as={TouchableOpacity}
+                activeOpacity={0.7}
+                // onPress={() => navigation.navigate("NearBy")}
+              >
+                <Icon
+                  icon={require(`../../assets/icons/icon-location.png`)}
+                  size={30}
+                  style={{ marginRight: 15 }}
+                />
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontWeight: "bold", color: Colors.orange, marginBottom: 3 }}>Near by</Text>
+                  <Text>Services, Place-to-go, Shops</Text>
+                </View>
+                <Icon
+                  icon={require(`../../assets/icons/icon-backArrow.png`)}
+                  size={24}
+                  style={{ marginLeft: 15, transform: [{ rotate: "180deg" }] }}
+                />
+              </NearBy>
+          
+              {/* recent search */}
+              {searchHistory.length > 0 && <>
+                <Text style={{ color: Colors.darkBlue, fontSize: 14, fontWeight: "bold", marginBottom: 5 }}>
+                  {t('search_recentSearch')}
+                </Text>
+                <BorderItemWrapper>
+                  {searchHistory.map((item, index) => 
+                    <BorderItem as={TouchableOpacity}
+                      key={index}
+                      onPress={() => {
+                        dispatch(getShopSearchResult({ searchString: item }));
+                      }}
+                    >
+                      <BorderItemText>{item}</BorderItemText>
+                    </BorderItem>
+                  )}
+                </BorderItemWrapper>
+              </>}
+            </View>
+            
+            <ScrollView 
+              style={{ marginTop: 20 }}
+              contentContainerStyle={{ flexDirection: "row", paddingHorizontal: Layout.page.paddingHorizontal }}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+            >
+              <HotPicks/>
+              <HotPicks/>
+            </ScrollView>
       
           </ScrollView>
         }
 
+        {/* quick search result */}
+        {mode == "search" && searchString != "" &&
+          <View style={{ marginTop: 30 }}>
+            {quickSearchStatus == "loading"
+              ? <ActivityIndicator color="#AAAAAA"/>
+              : quickSearchResult.length > 0
+                ? <ShopList 
+                    data={quickSearchResult} 
+                    endComponent={<>
+                      {quickSearchResult.length >= 20 &&
+                        <TouchableOpacity 
+                          style={{ 
+                            paddingHorizontal: 10,
+                            marginRight: 20
+                          }}
+                          onPress={() => {
+                            dispatch(getShopSearchResult({
+                              searchString
+                            }));
+                          }}
+                        >
+                          <Text>{t("search_more")}</Text>
+                        </TouchableOpacity>
+                      }
+                      </>}
+                  />
+                : <Text style={{ alignSelf: "center" }}>{t("search_noResult")}</Text>
+            }
+          </View>
+        }
+
         {mode == "filter" &&
           <View style={{ flex: 1, paddingTop: 10 }}>
-            <FilterTab filter={filter} addFilter={addFilter} />
+            <FilterTab/>
             <WideButton
-              text={"Search" + (filterCount > 0 ? ` (${filterCount})` : "")}
+              text={t('search_search') + (filterCount > 0 ? ` (${filterCount})` : "")}
               onPress={search}
               style={{
                 marginTop: "auto",
@@ -232,9 +276,6 @@ export default function SearchScreen() {
             />
           </View>
         }
-
-
-        {isFilterOn && <FilterMenu filter={filter} setFilter={setFilter} />}
         
       </View>
       

@@ -9,4 +9,7 @@ export default {
     height,
   },
   isSmallDevice: width < 375,
+  page: {
+    paddingHorizontal: width * 0.045
+  }
 };

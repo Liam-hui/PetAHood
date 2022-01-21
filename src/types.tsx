@@ -11,13 +11,14 @@ declare global {
 
 export type RootStackParamList = {
   Root: NavigatorScreenParams<RootTabParamList> | undefined;
-  Modal: undefined;
-  NotFound: undefined;
+  // Modal: undefined;
+  // NotFound: undefined;
   Profile: undefined,
   Search: undefined,
   SearchResult: undefined,
+  NearBy: undefined,
   ShopDetail: { id: number },
-  Blog: { url: string }
+  Blog: { id: number }
   AlbumModal: { images: any[], index?: number }
 };
 

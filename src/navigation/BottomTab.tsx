@@ -2,7 +2,6 @@ import * as React from 'react';
 import { View, Image, TouchableOpacity, ImageSourcePropType } from 'react-native';
 import { createBottomTabNavigator, BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { SafeAreaInsetsContext } from 'react-native-safe-area-context';
-import i18n from "i18next";
 import { useTranslation } from "react-i18next";
 
 import { StyledText } from '../styles';
@@ -12,9 +11,11 @@ import TabTwoScreen from '../screens/TabTwoScreen';
 const BottomTab = createBottomTabNavigator();
 
 const BottomTabNavigator = () => {
+  const { t } = useTranslation();
+
   return (
     <BottomTab.Navigator
-      initialRouteName="TabOne"
+      initialRouteName="Home"
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: "white",
@@ -25,22 +26,22 @@ const BottomTabNavigator = () => {
       <BottomTab.Screen
         name="Home"
         component={HomeScreen}
-        options={{ title: 'Home' }}
+        options={{ title: t("bottomTabItem_home") }}
       />
       <BottomTab.Screen
         name="Calendar"
         component={TabTwoScreen}
-        options={{ title: 'Calendar' }}
+        options={{ title: t("bottomTabItem_calendar") }}
       />
       <BottomTab.Screen
         name="Favourites"
         component={TabTwoScreen}
-        options={{ title: 'Favourites' }}
+        options={{ title: t("bottomTabItem_favourites") }}
       />
       <BottomTab.Screen
         name="Community"
         component={TabTwoScreen}
-        options={{ title: 'Community' }}
+        options={{ title: t("bottomTabItem_community") }}
       />
     </BottomTab.Navigator>
   );
@@ -57,6 +58,7 @@ const TabBar = (props: BottomTabBarProps) => {
           const isFocused = state.index === index;
           if (route.name != "Profile") return (
             <TouchableOpacity 
+              key={index}
               style={{ flex: 1, height: 55, alignItems: "center", justifyContent: "center" }}
               onPress={() => { 
                 !isFocused && navigation.navigate(route.name); 
@@ -79,7 +81,7 @@ const TabBar = (props: BottomTabBarProps) => {
           activeOpacity={0.6}
           style={{ paddingHorizontal: 8, height: 55, justifyContent: "flex-end" }}
           onPress={() => { 
-            navigation.navigate('Profile'); 
+            // navigation.navigate('Profile'); 
           }}
         >
           <Image 
@@ -98,10 +100,10 @@ const TabBarIcons: { [key: string]: ImageSourcePropType } = {
   "HomeFocused": require("../assets/icons/icon-tabBarItem-home-focused.png"),
   "Calendar": require("../assets/icons/icon-tabBarItem-calendar.png"),
   "CalendarFocused": require("../assets/icons/icon-tabBarItem-calendar-focused.png"),
-  "Favourites": require("../assets/icons/icon-tabBarItem-home.png"),
-  "FavouritesFocused": require("../assets/icons/icon-tabBarItem-home-focused.png"),
-  "Community": require("../assets/icons/icon-tabBarItem-home.png"),
-  "CommunityFocused": require("../assets/icons/icon-tabBarItem-home-focused.png"),
+  "Favourites": require("../assets/icons/icon-tabBarItem-favourites.png"),
+  "FavouritesFocused": require("../assets/icons/icon-tabBarItem-favourites-focused.png"),
+  "Community": require("../assets/icons/icon-tabBarItem-community.png"),
+  "CommunityFocused": require("../assets/icons/icon-tabBarItem-community.png"),
 }
 
 export default BottomTabNavigator;

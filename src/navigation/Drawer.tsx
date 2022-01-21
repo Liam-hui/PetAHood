@@ -6,6 +6,11 @@ import { useTranslation } from "react-i18next";
 
 import Colors from "@/constants/Colors";
 import StackNavigator from './Stack';
+import { useAppDispatch } from '@/hooks';
+import { getHomePageData } from '@/store/homePageData';
+import { initShopSearch } from '@/store/shopSearch';
+import { clearShopDetails } from '@/store/shopDetails';
+import { clearBlogDetails } from '@/store/blogDetails';
 
 const Drawer = createDrawerNavigator();
 
@@ -25,6 +30,15 @@ const DrawerNavigaor = () => {
 
 const DrawerContent = (props: DrawerContentComponentProps) => {
   const { t } = useTranslation();
+  const dispatch = useAppDispatch();
+
+  const onLanguageChange = () => {
+    dispatch(getHomePageData());
+    dispatch(initShopSearch());
+    dispatch(clearShopDetails());
+    dispatch(clearBlogDetails());
+  }
+
   return (
     <SafeAreaView style={{ borderRightWidth: 4, borderRightColor: "#DB6865" }} >
       <View style={{ height: "100%", paddingTop: 60, paddingBottom: 30 }} >
@@ -79,7 +93,10 @@ const DrawerContent = (props: DrawerContentComponentProps) => {
           icon={require(`../assets/icons/icon-drawerItem-lang.png`)}
           label={i18n.language == "en" ? "繁" : "Eng"}
           onPress={() => {
-            i18n.changeLanguage(i18n.language == "en" ? "zh" : "en");
+            i18n.changeLanguage(
+              i18n.language == "en" ? "zh" : "en",
+              onLanguageChange
+            );
           }}
         />
       </View>

@@ -15,8 +15,8 @@ const initialState: ShopDetailsState = {
 export const getShopDetailById = createAsyncThunk(
   'getShopDetailById',
   async (id: number) => {
-    const data = await getShopDetailByIdApi(id);
-    return { id, data };
+    const response = await getShopDetailByIdApi(id);
+    return { id, response };
   }
 );
 
@@ -24,6 +24,9 @@ export const shopDetailsSlice = createSlice({
   name: 'shopDetails',
   initialState,
   reducers: {
+    clearShopDetails: (state) => {
+      state.data = {};
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -31,12 +34,17 @@ export const shopDetailsSlice = createSlice({
         state.status = 'loading';
       })
       .addCase(getShopDetailById.fulfilled, (state, action) => {
-        state.status = 'idle';
-        if (action.payload != null) {
-          state.data[action.payload.id] = action.payload.data;
+        if (action.payload.response.isSuccess) {
+          state.status = 'idle';
+          state.data[action.payload.id] = action.payload.response.data;
+        }
+        else {
+          state.status = 'idle';
         }
       })
   },
 });
+
+export const { clearShopDetails } = shopDetailsSlice.actions;
 
 export default shopDetailsSlice.reducer;
