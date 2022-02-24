@@ -1,10 +1,10 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { HOST } from '@/constants';
 // import storage from '@/utils/storage';
 
 const api = axios.create({
-  // baseURL: 'https://petahood.com/api/v1',
-  baseURL: 'https://pettest.itisdemo.com/api/v1',
+  baseURL: HOST + "api/v1"
 });
 
 api.interceptors.request.use(async (config) => {

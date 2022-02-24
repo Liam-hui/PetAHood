@@ -2,13 +2,15 @@ import React, { useState, useRef } from 'react';
 import { Animated, View, TouchableOpacity } from 'react-native';
 import Icon from '@/components/Icon';
 
-export default function HideAndShow({ height, children, shownElement, style }: { height: number, children: React.ReactNode, shownElement: React.ReactNode, style?: object }) {
+export default function HideAndShow({ children, shownElement, onShow, onHide, isAtBottom, isHideArrow, style }: { children: React.ReactNode, shownElement: React.ReactNode, onShow?: () => void, onHide?: () => void, isAtBottom?: boolean, isHideArrow?: boolean, style?: object }) {
 
   const [isShown, setIsShown] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
   const [hiddenHeight, setHiddenHeight] = useState(0);
   const showAnim = useRef(new Animated.Value(0)).current;
   
   const startAnimation = () => {
+    setIsAnimating(true);
     Animated.timing(
       showAnim,
       {
@@ -18,56 +20,70 @@ export default function HideAndShow({ height, children, shownElement, style }: {
       }
     ).start(({ finished }) => {
       if (finished) {
+        if (!isShown && onShow) onShow();
+        if (isShown && onHide) onHide();
         setIsShown(!isShown);
+        setIsAnimating(false);
       }
     });
   };
   
   return (
-    <Animated.View 
-      style={{ 
-        height: showAnim.interpolate({
-          inputRange: [0, 1],
-          outputRange: [height, height + hiddenHeight]
-        }),
-        width: "100%", 
-        overflow: "hidden",
-        ...style! 
-      }}
-    >
+    <View style={{ flexDirection: isAtBottom ? "column-reverse" : "column" }}>
       <TouchableOpacity 
         activeOpacity={0.4}
-        style={{ width: "100%", height: height, flexDirection: "row", alignItems: "center" }}
+        style={{ width: "100%", flexDirection: "row", alignItems: "center" }}
         onPress={startAnimation}
       >
         {shownElement}
-        <Animated.View  
-          style={{ 
-            marginLeft: "auto", 
-            transform: [{ 
-              rotateZ: showAnim.interpolate({
-                inputRange: [0, 0.8],
-                outputRange: ["0deg", "-180deg"],
-                extrapolate: 'clamp',
-              })
-            }],
-          }}
-        >
-          <Icon
-            icon={require(`../assets/icons/icon-downArrow.png`)}
-            size={24}
-          />
-        </Animated.View>
+        {!isHideArrow && 
+          <Animated.View  
+            style={{ 
+              transform: [{ 
+                rotateZ: showAnim.interpolate({
+                  inputRange: [0, 0.8],
+                  outputRange: ["0deg", "-180deg"],
+                  extrapolate: 'clamp',
+                })
+              }],
+            }}
+          >
+            <Icon
+              icon={require(`../assets/icons/icon-downArrow.png`)}
+              size={24}
+            />
+          </Animated.View>
+        }
       </TouchableOpacity>
-      <View 
-        onLayout={(event) => {
-          setHiddenHeight(event.nativeEvent.layout.height);
+      <Animated.View 
+        style={{ 
+          ...(!isShown || isAnimating) && {
+            height: showAnim.interpolate({
+              inputRange: [0, 1],
+              outputRange: [1, 1 + hiddenHeight]
+            }),
+          },
+          overflow: isShown ? "visible" : "hidden",
+          ...style! 
         }}
-        style={{ width: "100%" }}
-      > 
-        {children}
-      </View>
-    </Animated.View>
+      >
+        <Animated.View 
+          onLayout={(event) => {
+            setHiddenHeight(event.nativeEvent.layout.height);
+          }}
+          style={{ 
+            width: "100%",
+            opacity: showAnim.interpolate({
+              inputRange: [0, 1],
+              outputRange: [0, 1]
+            }),
+          }}
+          pointerEvents={isShown ? "auto" : "none"}
+        > 
+          {children}
+        </Animated.View>
+      </Animated.View>
+    </View>
   );
 }
 

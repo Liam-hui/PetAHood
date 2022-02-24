@@ -1,14 +1,7 @@
 import { createAsyncThunk, createSlice, isRejected, isRejectedWithValue, PayloadAction } from '@reduxjs/toolkit';
 import { RootState, AppThunk } from '@/store';
-import { getDistrictsApi, getNeedTypesApi, getPetTypesApi, getShopSearchResultApi, getShopQuickSearchResultApi } from './api';
-
-type FilterNameType = "districts" | "petTypes" | "needTypes";
-
-type FilterType = {
-  districts: any[],
-  petTypes: any[],
-  needTypes: any[],
-};
+import { getDistrictsApi, getNeedTypesApi, getPetTypesApi, getShopSearchResultApi, getShopQuickSearchResultApi, getRatingPicksApi, getCommentsPicksApi, getSpecialCatsApi } from './api';
+import { FilterType, FilterNameType } from '@/types';
 
 export interface ShopSearchState {
   status: 'idle' | 'loading' | 'failed' | 'success';
@@ -19,18 +12,27 @@ export interface ShopSearchState {
   nextPage: number | null;
   params: any;
   filter: FilterType;
-  filterString: string;
+  filterString: string[];
   filterList: { 
-    districts: { [key: number]: string; },
-    petTypes: { [key: number]: string; },
-    needTypes: { 
+    districts: { 
       name: string,
-      sub_cats: {
+      subCats: {
         name: string,
-        sub_cats: { [key: number]: string; }
+        items: { id: number, name: string }[]
       }[]
     }[],
+    needTypes: { 
+      name: string,
+      subCats: {
+        name: string,
+        items: { id: number, name: string }[]
+      }[]
+    }[],
+    petTypes: { id: number, name: string }[],
+    specialCats: { id: number, name: string }[],
   };
+  ratingPicks: any[];
+  commentsPicks: any[];
 }
 
 const initialState: ShopSearchState = {
@@ -45,13 +47,17 @@ const initialState: ShopSearchState = {
     districts: [],
     petTypes: [],
     needTypes: [],
+    specialCats: []
   },
-  filterString: "",
+  filterString: [],
   filterList: {
-    districts: {},
-    petTypes: {},
+    districts: [],
     needTypes: [],
-  }
+    petTypes: [],
+    specialCats: []
+  },
+  ratingPicks: [],
+  commentsPicks: []
 };
 
 const getDistricts = createAsyncThunk(
@@ -78,6 +84,14 @@ const getNeedTypes = createAsyncThunk(
   }
 );
 
+const getSpecialCats = createAsyncThunk(
+  'getSpecialCats',
+  async () => {
+    const response = await getSpecialCatsApi();
+    return { response };
+  }
+);
+
 export const getShopSearchResult = createAsyncThunk(
   'getShopSearchResult',
   async (params: any) => {
@@ -92,7 +106,7 @@ export const getShopSearchResultNextPage = createAsyncThunk(
     const state = getState() as any;
     const { params, nextPage } = state.shopSearch;
     const response = await getShopSearchResultApi(params, nextPage);
-    return { response };
+    return { response, nextPage };
   }
 );
 
@@ -100,6 +114,22 @@ export const getShopQuickSearchResult = createAsyncThunk(
   'getShopQuickSearchResult',
   async (params: any) => {
     const response = await getShopQuickSearchResultApi(params);
+    return { response };
+  }
+);
+
+export const getRatingPicks = createAsyncThunk(
+  'getRatingPicks',
+  async () => {
+    const response = await getRatingPicksApi();
+    return { response };
+  }
+);
+
+export const getCommentsPicks = createAsyncThunk(
+  'getCommentsPicks',
+  async () => {
+    const response = await getCommentsPicksApi();
     return { response };
   }
 );
@@ -121,21 +151,28 @@ export const shopSearchSlice = createSlice({
         districts: [],
         petTypes: [],
         needTypes: [],
+        specialCats: []
       };
-      state.filterString = "";
+      state.filterString = [];
     },
-    setShopSearchFilter: (state, action: PayloadAction<{ filterName: FilterNameType, value: number, label: string }>) => {
-      const { filterName, value, label } = action.payload;
-      const index = state.filter[filterName].findIndex(x => x == value);
-      state.filter = {
-        ...state.filter,
-        [filterName]: index == -1
-          ? state.filter[filterName].concat(value)
-          : state.filter[filterName].filter(x => x != value)
-      };
-      state.filterString = index == -1
-        ? state.filterString + (state.filterString == "" ? "" : ", ") + label
-        : state.filterString.replace(", " + label, "").replace(label + ", ", "").replace(label!, "")
+    setShopSearchFilter: (state, action: PayloadAction<{ filterName: FilterNameType, items: { id: number, name: string }[], isForceAdd?: boolean }>) => {
+      const { filterName, items, isForceAdd } = action.payload;
+      let filter = { ...state.filter };
+      let filterString = state.filterString;
+      for (const { id, name } of items) {
+        const isSelected = filter[filterName].findIndex(x => x == id) != -1;
+        filter = {
+          ...filter,
+          [filterName]: isSelected
+            ? (isForceAdd ? filter[filterName] : filter[filterName].filter(x => x != id))
+            : filter[filterName].concat(id)
+        };
+        filterString = isSelected
+          ? (isForceAdd ? filterString : filterString.filter(x => x != name))
+          : filterString.concat(name);
+      }
+      state.filter = filter;
+      state.filterString = filterString;
     },
   },
   extraReducers: (builder) => {
@@ -146,13 +183,18 @@ export const shopSearchSlice = createSlice({
         }
       })
       .addCase(getPetTypes.fulfilled, (state, action) => {
-        if (action.payload.response.isSuccess) {
+        if (action.payload.response.isSuccess && action.payload.response.data) {
           state.filterList.petTypes = action.payload.response.data;
         }
       })
       .addCase(getNeedTypes.fulfilled, (state, action) => {
         if (action.payload.response.isSuccess) {
           state.filterList.needTypes = action.payload.response.data;
+        }
+      })
+      .addCase(getSpecialCats.fulfilled, (state, action) => {
+        if (action.payload.response.isSuccess && action.payload.response.data) {
+          state.filterList.specialCats = action.payload.response.data;
         }
       })
       .addCase(getShopSearchResult.pending, (state) => {
@@ -180,8 +222,10 @@ export const shopSearchSlice = createSlice({
       .addCase(getShopSearchResultNextPage.fulfilled, (state, action) => {
         if (action.payload.response.isSuccess) {
           state.status = 'success';
-          state.result = state.result.concat(action.payload.response.result);
-          state.nextPage = action.payload.response.nextPage;
+          if (state.nextPage == null || action.payload.response.nextPage == state.nextPage + 1) {
+            state.result = state.result.concat(action.payload.response.result);
+            state.nextPage = action.payload.response.nextPage;
+          }
         }
         else {
           state.status = 'failed';
@@ -199,6 +243,16 @@ export const shopSearchSlice = createSlice({
           state.quickSearchStatus = 'failed';
         }
       })
+      .addCase(getRatingPicks.fulfilled, (state, action) => {
+        if (action.payload.response.isSuccess) {
+          state.ratingPicks = action.payload.response.result;
+        }
+      })
+      .addCase(getCommentsPicks.fulfilled, (state, action) => {
+        if (action.payload.response.isSuccess) {
+          state.commentsPicks = action.payload.response.result;
+        }
+      })
   },
 });
 
@@ -213,6 +267,7 @@ export const initShopSearch = (): AppThunk => (
   dispatch(getDistricts());
   dispatch(getPetTypes());
   dispatch(getNeedTypes());
+  dispatch(getSpecialCats());
 };
 
 export default shopSearchSlice.reducer;

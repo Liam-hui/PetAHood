@@ -4,7 +4,7 @@ import { createBottomTabNavigator, BottomTabBarProps } from '@react-navigation/b
 import { SafeAreaInsetsContext } from 'react-native-safe-area-context';
 import { useTranslation } from "react-i18next";
 
-import { StyledText } from '../styles';
+import { Text } from '@/components/Themed';
 import HomeScreen from '../screens/HomeScreen';
 import TabTwoScreen from '../screens/TabTwoScreen';
 
@@ -69,11 +69,11 @@ const TabBar = (props: BottomTabBarProps) => {
                 resizeMode="contain"
                 source={TabBarIcons[route.name + (isFocused ? "Focused" : "")]} 
               />
-              <StyledText
+              <Text
                 style={{ fontWeight: "bold", fontSize: 13, color: "white", textAlign: 'center' }}
               >
                 {title}
-              </StyledText>
+              </Text>
             </TouchableOpacity>
           );
         })}
@@ -81,6 +81,7 @@ const TabBar = (props: BottomTabBarProps) => {
           activeOpacity={0.6}
           style={{ paddingHorizontal: 8, height: 55, justifyContent: "flex-end" }}
           onPress={() => { 
+            navigation.navigate('Login'); 
             // navigation.navigate('Profile'); 
           }}
         >

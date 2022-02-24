@@ -5,7 +5,6 @@ import Layout from '@/constants/Layout';
 export const TabContainer = styled.View`
   flex: 1;
   padding-top: 10px;
-  padding-horizontal: ${Layout.page.paddingHorizontal}px;
 `;
 
 export const NearBy = styled.View`
@@ -61,7 +60,7 @@ export const BorderItemLargeText = styled.Text`
 export const HotPicksContainer = styled.View`
   background-color: white;
   border-radius: 10px;
-  width: 280px;
+  width: 290px;
   overflow: hidden;
   margin-right: 20px;
 `;

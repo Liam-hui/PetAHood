@@ -19,7 +19,6 @@ export const ShopItemContainer = styled.TouchableOpacity`
 `;
 
 export const ShopTitle = styled.Text`
-  flex: 1;
   font-weight: bold;
   font-size: 14px;
   line-height: 18px;

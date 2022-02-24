@@ -7,9 +7,7 @@ import { TabView, TabBar, SceneMap, SceneRendererProps, NavigationState } from '
 
 import Icon from '../../components/Icon';
 import FootprintGraph from '../../components/FootprintGraph';
-import PlacesList from '../../components/PlacesList';
-import { Row } from '../../styles';
-import { NameText, LinkText, LabelText, NumberText, Shadow, CircleImage, Border } from './styles';
+import { Row, NameText, LinkText, LabelText, NumberText, Shadow, CircleImage, Border } from './styles';
 
 export default function ProfileScreen() {
   return (
@@ -31,7 +29,7 @@ const Header = () => {
           <Icon
             icon={require(`../../assets/icons/icon-backArrow.png`)}
             size={24}
-            onPress={() => navigation.dispatch(popAction) }
+            onPress={() => navigation.dispatch(popAction)}
           />
           <Icon
             icon={require(`../../assets/icons/icon-qrCode.png`)}
@@ -145,10 +143,11 @@ const MyTabView = () => {
   const renderScene = SceneMap({
     favourite: () => <View style={{ flex: 1}} />,
     reviews: () => <View style={{ flex: 1}} />,
-    footprint: () => 
-      <View style={{ flex: 1}}>
-        <FootprintGraph/>
-      </View>,
+    footprint: () => <View style={{ flex: 1}} />,
+    // footprint: () => 
+    //   <View style={{ flex: 1}}>
+    //     <FootprintGraph/>
+    //   </View>,
     voucher: () => <View style={{ flex: 1}} />,
     orders: () => <View style={{ flex: 1}} />,
   });

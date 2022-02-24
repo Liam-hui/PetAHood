@@ -9,7 +9,7 @@ import Icon from '@/components/Icon';
 import SearchBar from '@/components/SearchBar';
 import Colors from '@/constants/Colors';
 import WideButton from '@/components/WideButton';
-import { getShopQuickSearchResult, getShopSearchResult, resetShopQuickSearch, resetShopSearchFilter } from '@/store/shopSearch';
+import { getCommentsPicks, getRatingPicks, getShopQuickSearchResult, getShopSearchResult, resetShopQuickSearch, resetShopSearchFilter, setShopSearchFilter } from '@/store/shopSearch';
 import { FilterTab } from './FilterTab';
 
 import { NearBy, BorderItem, BorderItemText, BorderItemWrapper } from './styles';
@@ -18,6 +18,8 @@ import { useTranslation } from 'react-i18next';
 import ShopList from '@/components/ShopList';
 import HotPicks from './HotPicks';
 import Layout from '@/constants/Layout';
+import { FilterNameType } from '@/types';
+import { ShopItemLarge, ShopItemRow } from '@/components/ShopItem';
 
 export default function SearchScreen() {
   
@@ -26,7 +28,8 @@ export default function SearchScreen() {
   const navigation = useNavigation();
   const popAction = StackActions.pop(1);
   const dispatch = useAppDispatch();
-  const isFocused = useIsFocused();
+  // const isFocused = useIsFocused();
+  const [hasSearch, setHasSearch] = useState(false);
 
   const searchStatus = useAppSelector((state: RootState) => state.shopSearch.status);
   const [searchHistory, setSearchHistory] = useState([]);
@@ -37,33 +40,62 @@ export default function SearchScreen() {
   const quickSearchStatus = useAppSelector((state: RootState) => state.shopSearch.quickSearchStatus);
   const quickSearchResult = useAppSelector((state: RootState) => state.shopSearch.quickSearchResult);
 
+  const ratingPicks = useAppSelector((state: RootState) => state.shopSearch.ratingPicks);
+  const commentsPicks = useAppSelector((state: RootState) => state.shopSearch.commentsPicks);
+
+  // const [filter, setFilter] = useState<FilterType>({
+  //   districts: [],
+  //   petTypes: [],
+  //   needTypes: [],
+  //   specialCats: [],
+  // });
   const filter = useAppSelector((state: RootState) => state.shopSearch.filter);
-  const filterString = useAppSelector((state: RootState) => state.shopSearch.filterString);
+  const [filterStringArray, setFilterStringArray] = useState<string[]>([]);
+  const filterString = useAppSelector((state: RootState) => state.shopSearch.filterString).reduce(
+    (previousValue, currentValue) => previousValue + (previousValue == "" ? "" : ", ") + currentValue
+  , "");
   const filterCount = Object.values(filter).reduce(
-    (prev, current) => {
-      return prev + current.length
-    }, 
-    0
-  );
+  (prev, current) => {
+    return prev + current.length
+  }, 
+  0
+);
+
+  const updateFilter = (filterName: FilterNameType, items: { id: number, name: string }[], isForceAdd?: boolean) => {
+    dispatch(setShopSearchFilter({ filterName, items, isForceAdd }));
+  }
+
+  const resetFilter = () => {
+    // setFilter({
+    //   districts: [],
+    //   petTypes: [],
+    //   needTypes: [],
+    //   specialCats: [],
+    // });
+    dispatch(resetShopSearchFilter());
+    setFilterStringArray([]);
+  }
   
   const [mode, setMode] = useState<string | null>(null);
 
   useEffect(() => {
     searchInputRef.current!.focus();
-
-    return resetFilter;
+    dispatch(getRatingPicks());
+    dispatch(getCommentsPicks());
   }, [])
 
   useEffect(() => {
-    if (isFocused) {
+    if (hasSearch) {
       if (searchStatus == "loading") {
         dispatch(showLoading());
       }
       else if (searchStatus == "success") {
+        setHasSearch(false);
         dispatch(hideLoading());
         navigation.navigate("SearchResult");
       }
       else if (searchStatus == "failed") {
+        setHasSearch(false);
         dispatch(hideLoading());
       }
     }
@@ -82,11 +114,27 @@ export default function SearchScreen() {
   }, [searchString])
 
   const search = () => {
-    if (searchString != "" || filterCount > 0)
+    if (searchString != "" || filterCount > 0) {
+      setHasSearch(true);
       dispatch(getShopSearchResult({
         searchString,
         filter
       }));
+    }
+  }
+
+  const searchFromHistory = (searchString: string) => {
+    setHasSearch(true);
+    dispatch(getShopSearchResult({ searchString }));
+  }
+
+  const searchFromQuickSearch = () => {
+    if (searchString != "" || filterCount > 0) {
+      setHasSearch(true);
+      dispatch(getShopSearchResult({
+        searchString,
+      }));
+    }
   }
 
   const quickSearch = () => {
@@ -97,10 +145,6 @@ export default function SearchScreen() {
     else {
       dispatch(resetShopQuickSearch());
     }
-  }
-
-  const resetFilter = () => {
-    dispatch(resetShopSearchFilter());
   }
 
   return (
@@ -137,7 +181,7 @@ export default function SearchScreen() {
         /> */}
       </View>
 
-      <View style={{ flex: 1, paddingBottom: insets.bottom + 15 }}>
+      <View style={{ flex: 1 }}>
 
         {/* search bars */}
         <View style={{ backgroundColor: "white", paddingHorizontal: 20 }}>
@@ -153,6 +197,7 @@ export default function SearchScreen() {
             }}
             unselect={() => {
               setMode(null);
+              setSearchString("");
             }}
             style={{ marginBottom: 10 }}
           />
@@ -175,13 +220,14 @@ export default function SearchScreen() {
         {(mode == null || (mode == "search" && searchString == "")) &&
           <ScrollView
             contentContainerStyle={{
-              paddingVertical: 20,
+              paddingTop: 20,
+              paddingBottom: insets.bottom + 15
             }}
           >
             <View style={{ paddingHorizontal: Layout.page.paddingHorizontal }}>
               <NearBy as={TouchableOpacity}
                 activeOpacity={0.7}
-                // onPress={() => navigation.navigate("NearBy")}
+                onPress={() => navigation.navigate("NearBy")}
               >
                 <Icon
                   icon={require(`../../assets/icons/icon-location.png`)}
@@ -189,8 +235,8 @@ export default function SearchScreen() {
                   style={{ marginRight: 15 }}
                 />
                 <View style={{ flex: 1 }}>
-                  <Text style={{ fontWeight: "bold", color: Colors.orange, marginBottom: 3 }}>Near by</Text>
-                  <Text>Services, Place-to-go, Shops</Text>
+                  <Text style={{ fontWeight: "bold", color: Colors.orange, marginBottom: 3 }}>{t("nearby_heading")}</Text>
+                  <Text>{t("nearby_description")}</Text>
                 </View>
                 <Icon
                   icon={require(`../../assets/icons/icon-backArrow.png`)}
@@ -200,7 +246,7 @@ export default function SearchScreen() {
               </NearBy>
           
               {/* recent search */}
-              {searchHistory.length > 0 && <>
+              {searchHistory?.length > 0 && <>
                 <Text style={{ color: Colors.darkBlue, fontSize: 14, fontWeight: "bold", marginBottom: 5 }}>
                   {t('search_recentSearch')}
                 </Text>
@@ -208,9 +254,7 @@ export default function SearchScreen() {
                   {searchHistory.map((item, index) => 
                     <BorderItem as={TouchableOpacity}
                       key={index}
-                      onPress={() => {
-                        dispatch(getShopSearchResult({ searchString: item }));
-                      }}
+                      onPress={() => searchFromHistory(item)}
                     >
                       <BorderItemText>{item}</BorderItemText>
                     </BorderItem>
@@ -219,53 +263,56 @@ export default function SearchScreen() {
               </>}
             </View>
             
-            <ScrollView 
-              style={{ marginTop: 20 }}
-              contentContainerStyle={{ flexDirection: "row", paddingHorizontal: Layout.page.paddingHorizontal }}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-            >
-              <HotPicks/>
-              <HotPicks/>
-            </ScrollView>
-      
+            {(ratingPicks?.length > 0 || commentsPicks?.length > 0) && 
+              <ScrollView 
+                style={{ marginTop: 20 }}
+                contentContainerStyle={{ flexDirection: "row", paddingHorizontal: Layout.page.paddingHorizontal }}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+              >
+                {ratingPicks?.length > 0 && <HotPicks data={ratingPicks} />}
+                {commentsPicks?.length > 0 && <HotPicks data={commentsPicks} />}
+              </ScrollView>
+            }
+        
           </ScrollView>
         }
 
         {/* quick search result */}
         {mode == "search" && searchString != "" &&
-          <View style={{ marginTop: 30 }}>
+          <>
             {quickSearchStatus == "loading"
-              ? <ActivityIndicator color="#AAAAAA"/>
-              : quickSearchResult.length > 0
-                ? <ShopList 
-                    data={quickSearchResult} 
-                    endComponent={<>
-                      {quickSearchResult.length >= 20 &&
-                        <TouchableOpacity 
-                          style={{ 
-                            paddingHorizontal: 10,
-                            marginRight: 20
-                          }}
-                          onPress={() => {
-                            dispatch(getShopSearchResult({
-                              searchString
-                            }));
-                          }}
-                        >
-                          <Text>{t("search_more")}</Text>
-                        </TouchableOpacity>
-                      }
-                      </>}
-                  />
-                : <Text style={{ alignSelf: "center" }}>{t("search_noResult")}</Text>
+              ? <ActivityIndicator color="#AAAAAA" style={{ marginTop: 20 }} />
+              : quickSearchResult?.length > 0
+                ? <ScrollView contentContainerStyle={{ paddingHorizontal: Layout.page.paddingHorizontal, backgroundColor: "white" }}>
+                  {quickSearchResult.slice(0, 20).map((item) => {
+                    return (
+                      <ShopItemRow
+                        key={item.id}
+                        item={item}
+                      />
+                    )
+                  })}
+                  <TouchableOpacity 
+                    style={{ 
+                      alignSelf: "center",
+                      paddingHorizontal: 10,
+                      paddingVertical: 10,
+                      marginVertical: 10
+                    }}
+                    onPress={searchFromQuickSearch}
+                  >
+                    <Text>{t("search_more")}</Text>
+                  </TouchableOpacity>
+                </ScrollView>
+                : <Text style={{ alignSelf: "center", marginTop: 20 }}>{t("search_noResult")}</Text>
             }
-          </View>
+          </>
         }
 
         {mode == "filter" &&
-          <View style={{ flex: 1, paddingTop: 10 }}>
-            <FilterTab/>
+          <View style={{ flex: 1, paddingTop: 10, paddingBottom: insets.bottom + 15 }}>
+            <FilterTab filter={filter} updateFilter={updateFilter} />
             <WideButton
               text={t('search_search') + (filterCount > 0 ? ` (${filterCount})` : "")}
               onPress={search}

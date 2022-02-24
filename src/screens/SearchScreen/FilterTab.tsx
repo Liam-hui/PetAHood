@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { TabView, SceneMap } from 'react-native-tab-view';
 
@@ -11,16 +11,11 @@ import { useAppDispatch, useAppSelector } from '@/hooks';
 import { RootState } from '@/store';
 import { entries } from '@/utils/myUtils';
 import { ScrollView } from 'react-native-gesture-handler';
-import { setShopSearchFilter } from '@/store/shopSearch';
 import { useTranslation } from 'react-i18next';
+import { t } from 'i18next';
+import { FilterNameType, FilterType } from '@/types';
 
-const renderScene = SceneMap({
-  districts: () => <Tab filterName={"districts"} />,
-  petTypes: () => <Tab filterName={"petTypes"} />,
-  needTypes: () => <NeedTypesTab/>,
-});
-
-export function FilterTab() {
+export function FilterTab({ filter, updateFilter }: { filter: FilterType, updateFilter: (filterName: FilterNameType, items: { id: number, name: string }[], isForceAdd?: boolean) => void }) {
 
   const { t } = useTranslation();
 
@@ -29,12 +24,21 @@ export function FilterTab() {
     { key: 'districts', title: t("search_area") },
     { key: 'petTypes', title: t("search_petTypes") },
     { key: 'needTypes', title: t("search_needTypes") },
+    { key: 'specialCats', title: t("search_specialCats") },
   ]);
-
+  
   return (
     <TabView
       navigationState={{ index, routes }}
-      renderScene={renderScene}
+      renderScene={({ route }) => {
+        return route.key == "districts"
+          ? <TabWithSubcats filterName={"districts"} filter={filter} updateFilter={updateFilter} />
+          : route.key == "petTypes"
+            ? <Tab filterName={"petTypes"} filter={filter} updateFilter={updateFilter} />
+            : route.key == "needTypes"
+            ? <TabWithSubcats filterName={"needTypes"} filter={filter} updateFilter={updateFilter} />
+            : <Tab filterName={"specialCats"} filter={filter} updateFilter={updateFilter} />
+      }}
       renderTabBar={props =>
         <TabBar
           {...props}
@@ -47,36 +51,30 @@ export function FilterTab() {
   );
 }
 
-const Tab = ({ filterName }: { filterName: 'districts' | 'petTypes' }) => {
+const Tab = ({ filterName, filter, updateFilter }: { filterName: 'petTypes' | 'specialCats', filter: FilterType, updateFilter: (filterName: FilterNameType, items: { id: number, name: string }[], isForceAdd?: boolean) => void }) => {
 
-  const dispatch = useAppDispatch();
-  const filter = useAppSelector((state: RootState) => state.shopSearch.filter);
   const data = useAppSelector((state: RootState) => state.shopSearch.filterList[filterName]);
 
   return(
-    <TabContainer>
+    <TabContainer style={{ paddingHorizontal: Layout.page.paddingHorizontal }}>
       <BorderItemWrapper>
-        {entries(data).map(([value, label], index) => {
-          const isSelected = filter[filterName].findIndex(x => x == value) != -1;
+        {data.map(({ id, name }: { id: number, name: string }, index) => {
+          const isSelected = filter[filterName].findIndex(x => x == id) != -1;
           return <BorderItem as={TouchableOpacity}
             key={index}
-            onPress={() => {
-              dispatch(setShopSearchFilter({
-                filterName,
-                value,
-                label
-              }));
-            }}
+            onPress={() => updateFilter(filterName, [{ id, name }])}
             style={{
+              width: (Layout.window.width - Layout.page.paddingHorizontal * 2) / 3 - 8,
               ... isSelected && { backgroundColor: Colors.darkBlue }
             }}
           >
             <BorderItemText
+              numberOfLines={1}
               style={{
                 ... isSelected && { color: "white" }
               }}
             >
-              {label}
+              {name}
             </BorderItemText>
           </BorderItem>
         })}
@@ -85,65 +83,78 @@ const Tab = ({ filterName }: { filterName: 'districts' | 'petTypes' }) => {
   )
 }
 
-const NeedTypesTab = () => {
+const TabWithSubcats = ({ filterName, filter, updateFilter }: { filterName: 'districts' | 'needTypes', filter: FilterType, updateFilter: (filterName: FilterNameType, items: { id: number, name: string }[], isForceAdd?: boolean) => void }) => {
 
-  const dispatch = useAppDispatch();
-  const filter = useAppSelector((state: RootState) => state.shopSearch.filter);
-  const data = useAppSelector((state: RootState) => state.shopSearch.filterList.needTypes);
+  const data = useAppSelector((state: RootState) => state.shopSearch.filterList[filterName]);
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   return (
     <TabContainer>
       {data.length > 0 && <>
-        <View style={{ flexDirection: "row", width: "100%", justifyContent: "center" }}>
-          {data.map((cat, index) => {
-            const isSelected = index == selectedIndex;
-            return (
-              <BorderItemLarge as={TouchableOpacity}
-                key={index}
-                onPress={() => setSelectedIndex(index)}
-                style={{
-                  ... isSelected && { backgroundColor: Colors.orange }
-                }}
-              >
-                <BorderItemLargeText 
-                  style={{ 
-                    ... isSelected && { color: "white" } 
+        <View style={{ height: 40, width: "100%" }}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ flexDirection: "row", minWidth: "100%", justifyContent: "center", paddingHorizontal: Layout.page.paddingHorizontal }}>
+            {data.map((cat, index) => {
+              const isSelected = index == selectedIndex;
+              return (
+                <BorderItemLarge as={TouchableOpacity}
+                  key={index}
+                  onPress={() => setSelectedIndex(index)}
+                  style={{
+                    ... isSelected && { backgroundColor: Colors.orange }
                   }}
                 >
-                  {cat.name}
-                </BorderItemLargeText>
-              </BorderItemLarge>
-            )
-          })}
+                  <BorderItemLargeText 
+                    style={{ 
+                      ... isSelected && { color: "white" } 
+                    }}
+                  >
+                    {cat.name}
+                  </BorderItemLargeText>
+                </BorderItemLarge>
+              )
+            })}
+          </ScrollView>
         </View>
-        <ScrollView style={{ flex: 1 }}>
-          {data[selectedIndex]["sub_cats"].map((cat, index) => {
+        <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingTop: 10, paddingHorizontal: Layout.page.paddingHorizontal }} showsVerticalScrollIndicator={false}>
+          {data[selectedIndex].subCats.map((subCat, index) => {
+            const items = subCat.items;
             return (
               <View key={index} style={{ marginBottom: 20 }}>
-                <Text style={{ color: Colors.darkBlue, fontWeight: "bold", fontSize: 16, marginBottom: 5 }}>{cat.name}</Text>
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <Text style={{ color: Colors.darkBlue, fontWeight: "bold", fontSize: 16 }}>{subCat.name}</Text>
+                  <BorderItem as={TouchableOpacity}
+                    style={{ 
+                      marginLeft: "auto",
+                      borderColor: "#B2B2B2",
+                      height: 22,
+                      paddingHorizontal: 10
+                    }}
+                    onPress={() => {
+                      const isAllSelected = items.every(({ id }) => filter[filterName].findIndex(x => x == id) != -1);
+                      updateFilter(filterName, items, !isAllSelected)
+                    }}
+                  >
+                    <BorderItemText style={{ color: "#B2B2B2", fontSize: 13 }}>{t("search_selectAll")}</BorderItemText>
+                  </BorderItem>
+                </View>
                 <BorderItemWrapper>
-                  {entries(cat["sub_cats"]).map(([value, label], index) => {
-                    const isSelected = filter["needTypes"].findIndex(x => x == value) != -1;
+                  {items.map(({ id, name }: { id: number, name: string }, index) => {
+                    const isSelected = filter[filterName].findIndex(x => x == id) != -1;
                     return <BorderItem as={TouchableOpacity}
                       key={index}
-                      onPress={() => {
-                        dispatch(setShopSearchFilter({
-                          filterName: "needTypes",
-                          value,
-                          label
-                        }));
-                      }}
+                      onPress={() => updateFilter(filterName, [{ id, name }])}
                       style={{
+                        width: (Layout.window.width - Layout.page.paddingHorizontal * 2) / 3 - 8,
                         ... isSelected && { backgroundColor: Colors.darkBlue }
                       }}
                     >
                       <BorderItemText
+                        numberOfLines={1}
                         style={{
                           ... isSelected && { color: "white" }
                         }}
                       >
-                        {label}
+                        {name}
                       </BorderItemText>
                     </BorderItem>
                   })}
@@ -156,4 +167,3 @@ const NeedTypesTab = () => {
     </TabContainer>
   )
 }
-

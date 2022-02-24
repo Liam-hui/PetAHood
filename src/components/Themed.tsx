@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Text as DefaultText, View as DefaultView } from 'react-native';
+import { Text as DefaultText, View as DefaultView, TextInput as DefaultTextInput } from 'react-native';
 
 import Colors from '../constants/Colors';
 // import useColorScheme from '../hooks/useColorScheme';
@@ -25,12 +25,19 @@ type ThemeProps = {
 
 export type TextProps = ThemeProps & DefaultText['props'];
 export type ViewProps = ThemeProps & DefaultView['props'];
+export type TextInputProps = ThemeProps & DefaultTextInput['props'];
 
 export function Text(props: TextProps) {
   const { style, lightColor, darkColor, ...otherProps } = props;
   // const color = useThemeColor({ light: lightColor, dark: darkColor }, 'text');
 
   return <DefaultText style={[{ fontFamily: 'Helvetica Neue', color: Colors.darkBlue, fontSize: 14 }, style]} {...otherProps} />;
+}
+
+export function TextInput(props: TextInputProps) {
+  const {  style, ...otherProps } = props;
+
+  return <DefaultTextInput style={[{ width: "100%", borderWidth: 1, borderColor: "#DDDDDD", borderRadius: 5, paddingHorizontal: 5, paddingVertical: 10 }, style]} {...otherProps} />;
 }
 
 // export function View(props: ViewProps) {

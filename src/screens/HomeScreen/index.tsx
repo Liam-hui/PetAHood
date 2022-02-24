@@ -22,7 +22,6 @@ export default function HomeScreen() {
     <View style={{ flex: 1, backgroundColor: Colors.lightBlue }}>
       <Header/>
       <ScrollView>
-        
         <Banners data={homePageData.banners} />
         <Buttons data={homePageData.buttons} />
         <Shops data={homePageData.sliders} />
@@ -30,7 +29,6 @@ export default function HomeScreen() {
           {/* <Banner source={require(`../../assets/images/banner.png`)} /> */}
           <Inspirations data={homePageData.blogs} />
         </View>
-
       </ScrollView>
     </View>
   );

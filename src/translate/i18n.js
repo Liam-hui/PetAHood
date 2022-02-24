@@ -2,6 +2,8 @@ import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as RNLocalize from 'react-native-localize';
+import moment from 'moment';
+// import 'moment/locale/zh-hk'
 
 import en from './translations/en';
 import zh from './translations/zh';
@@ -26,12 +28,15 @@ const detector = {
           RNLocalize.findBestAvailableLanguage(Object.keys(languages));
 
         callback(findBestAvailableLanguage.languageTag || 'en');
+        // moment.locale(findBestAvailableLanguage.languageTag || 'en');
         return;
       }
+      // moment.locale(language == "zh" ? "zh-hk" : "en");
       callback(language);
     });
   },
-  init: () => {},
+  init: () => {
+  },
   cacheUserLanguage: language => {
     AsyncStorage.setItem('user-language', language);
   }
@@ -44,7 +49,6 @@ i18n
     resources: languages,
     fallbackLng: "en",
     debug: true,
-
     interpolation: {
       escapeValue: false
     }

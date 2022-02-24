@@ -13,10 +13,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import counterReducer from './counter';
 import loadingReducer from './loading';
+import authReducer from './auth';
 import homePageDataReducer from './homePageData';
 import shopDetailsReducer from './shopDetails';
 import shopSearchReducer from './shopSearch';
 import blogDetailsReducer from './blogDetails';
+import reviewsReducer from './reviews';
 
 const persistConfig = {
   key: 'root',
@@ -29,11 +31,13 @@ const persistedReducer = persistReducer(
   persistConfig, 
   combineReducers({
     counter: counterReducer,
+    auth: authReducer,
     loading: loadingReducer,
     homePageData: homePageDataReducer,
     shopDetails: shopDetailsReducer,
     shopSearch: shopSearchReducer,
-    blogDetails: blogDetailsReducer
+    blogDetails: blogDetailsReducer,
+    reviews: reviewsReducer
   })
 )
 

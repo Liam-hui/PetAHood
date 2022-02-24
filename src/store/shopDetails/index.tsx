@@ -39,7 +39,7 @@ export const shopDetailsSlice = createSlice({
           state.data[action.payload.id] = action.payload.response.data;
         }
         else {
-          state.status = 'idle';
+          state.status = 'failed';
         }
       })
   },

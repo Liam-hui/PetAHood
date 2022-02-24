@@ -1,5 +1,10 @@
 import styled from 'styled-components/native';
 
+export const Row = styled.View`
+  flex-direction: row;
+  align-items: center;
+`;
+
 export const NameText = styled.Text`
   color: #030335;
   font-weight: bold;

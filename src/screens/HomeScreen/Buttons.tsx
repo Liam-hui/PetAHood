@@ -13,8 +13,9 @@ export default function Buttons({ data }: { data: any[] }) {
     <ButtonsContainer style={{ paddingLeft: Layout.page.paddingHorizontal }}>
       {data.map(row => {
         return (
-          row.btns.map((item: any) =>
+          row.btns.map((item: any, index: number) =>
             <ButtonItem
+              key={index}
               label={item.name}
               icon={item.icon} 
               onPress={() => {}}

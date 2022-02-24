@@ -9,22 +9,23 @@ export default function ReadMoreText({ numberOfLines, children, style }: { numbe
   
   const onTextLayout = (e: any) => {
     setLines(e.nativeEvent.lines);
+    console.log(lines);
   };
   
   return (
     <>
       {lines.length == 0 &&
-        <Text style={{ ...style, opacity: 0, position: "absolute" }} onTextLayout={onTextLayout}>
+        <Text style={{ ...style, opacity: 1, position: "absolute", width: "100%", color: "red" }} onTextLayout={onTextLayout}>
           {children}
         </Text>
       }
       {(lines.length > 0 && lines.length > numberOfLines) 
-        ? <Text style={style}>
+        ? <Text style={{ ...style }}>
             {isShown
               ? <>
                 {children}
                 <Text 
-                    style={{ ...style, color: Colors.orange }}
+                    style={{ ...style, color: Colors.orange, }}
                     onPress={() => {
                       setIsShown(false);
                     }}

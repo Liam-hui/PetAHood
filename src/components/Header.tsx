@@ -4,8 +4,10 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { View, Text} from 'react-native';
 import { SafeAreaInsetsContext } from 'react-native-safe-area-context';
 import Icon from './Icon';
+import Colors from '@/constants/Colors';
+import Styles from '@/constants/Styles';
 
-export default function Header({ title }: { title?: string }) {
+export default function Header({ title, action, actionWidth, noShadow, isLeft }: { title?: string, action?: React.ReactNode, noShadow?: boolean, isLeft?: boolean, actionWidth?: number }) {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
   const popAction = StackActions.pop(1);
   
@@ -14,31 +16,42 @@ export default function Header({ title }: { title?: string }) {
       {insets => 
         <View 
           style={{ 
-            flexDirection: "row", 
-            alignItems: "center", 
-            justifyContent: "space-between", 
-            paddingBottom: 10, 
             backgroundColor: "white", 
             paddingHorizontal: 15, 
-            paddingTop: 13 + (insets?.top ?? 0),
+            paddingTop: 18 + (insets?.top ?? 0),
+            paddingBottom: 15, 
+            ... !noShadow && Styles.shadowStyle,
+            zIndex: 999,
           }} 
         >
-          <View style={{ width: 40 }}>
+          <View 
+            style={{ 
+              // flex: 1,
+              width: "100%",
+              flexDirection: "row", 
+              alignItems: "center",
+              ... isLeft ? { paddingLeft: 40 } : { justifyContent: "center" },
+            }
+          }>
             <Icon
               icon={require(`../assets/icons/icon-backArrow.png`)}
               size={24}
-              onPress={() => navigation.dispatch(popAction) }
+              onPress={() => navigation.dispatch(popAction)}
+              style={{ position: "absolute", left: 0 }}
             />
+
+            {title &&
+              <Text style={{ fontWeight: "700", fontSize: 18, color: Colors.orange, ...isLeft && { flex: 1 } }} numberOfLines={1}>{title}</Text>
+            }
+
+            {actionWidth && 
+              <View style={{ width: actionWidth }} />
+            }
+
+            <View style={{ position: "absolute", right: 0, alignItems: "flex-end" }}>
+              {action}
+            </View>
           </View>
-
-          {title &&
-            <Text style={{ fontWeight: "bold", fontSize: 16 }}>{title}</Text>
-          }
-
-          <View style={{ width: 40 }}>
-
-          </View>
-
         </View>
       }
     </SafeAreaInsetsContext.Consumer>
