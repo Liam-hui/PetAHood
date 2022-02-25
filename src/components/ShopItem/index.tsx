@@ -1,14 +1,13 @@
 import * as React from 'react';
-import { View, Text, Image, TouchableOpacity } from 'react-native';
+import { View, Text, Image, TouchableOpacity, ScrollView } from 'react-native';
 import FastImage from 'react-native-fast-image'
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { ShopItemLargeContainer, ShopItemContainer, ShopTitle, ShopTitleLarge } from './styles';
-import Icon from '../Icon';
 import Colors from '@/constants/Colors';
-import Styles from '@/constants/Styles';
+import Tag from '../Tag';
 
 export function ShopItemLarge({ item, style, isPressTitle }: { item: any, style?: any, isPressTitle?: boolean })  {
   const { t } = useTranslation();
@@ -42,41 +41,43 @@ export function ShopItemLarge({ item, style, isPressTitle }: { item: any, style?
           resizeMode="cover"
           source={{ uri: item.cover_image }} 
         />
-        <View style={{ flex: 1, paddingHorizontal: 11, paddingVertical: 12 }}>
-          <View style={{ flexDirection: "row" }}>
-            {/* title */}
-            <TouchableOpacity
-              onPress={openDetailPage}
-              disabled={!isPressTitle}
-              style={{ alignSelf: "flex-start", flex: 1 }}
-            >
-              <ShopTitle numberOfLines={2}>{item.name}</ShopTitle>
-            </TouchableOpacity>
-            {/* rating */}
-            <View style={{ flexDirection: "row", marginLeft: "auto" }}>
-              <Image 
-                style={{ width: 14, height: 14, marginRight: 2, marginLeft: 5 }}
-                source={require('../../assets/icons/icon-star.png')} 
-              />
-              <Text style={{ fontWeight: 'bold', marginRight: 2 }}>{item.approved_comments_with_show_avg_stars.toFixed(1)}</Text>
-              <Text>({item.approved_comments_with_show_count})</Text>
+        <View style={{ flex: 1, paddingVertical: 12 }}>
+          <View style={{ paddingHorizontal: 11 }}>
+            <View style={{ flexDirection: "row" }}>
+              {/* title */}
+              <TouchableOpacity
+                onPress={openDetailPage}
+                disabled={!isPressTitle}
+                style={{ alignSelf: "flex-start", flex: 1 }}
+              >
+                <ShopTitle numberOfLines={2}>{item.name}</ShopTitle>
+              </TouchableOpacity>
+              {/* rating */}
+              <View style={{ flexDirection: "row", marginLeft: "auto" }}>
+                <Image 
+                  style={{ width: 14, height: 14, marginRight: 2, marginLeft: 5 }}
+                  source={require('../../assets/icons/icon-star.png')} 
+                />
+                <Text style={{ fontWeight: 'bold', marginRight: 2 }}>{item.approved_comments_with_show_avg_stars.toFixed(1)}</Text>
+                <Text>({item.approved_comments_with_show_count})</Text>
+              </View>
             </View>
+            {/* location */}
+            {item.district?.name &&
+              <Text style={{ color: "#7F7F7F", fontSize: 12, marginTop: 8 }}>{`${item.district.name}/ ${t("shopItem_distancePre")}${item.distance_in_km.toFixed(1)}${t("shopItem_distanceSuf")}`}</Text>
+            }
           </View>
-          {/* location */}
-          {item.district?.name &&
-            <Text style={{ color: "#7F7F7F", fontSize: 12, marginTop: 8 }}>{`${item.district.name}/ ${t("shopItem_distancePre")}${item.distance_in_km.toFixed(1)}${t("shopItem_distanceSuf")}`}</Text>
-          }
           {/* type */}
           {item.filters?.length > 0 &&
-           <View style={{ flexDirection: "row", marginTop: "auto" }}>
-              {item.filters.map((type: any) => {
-                return (
-                  <View style={{ borderWidth: 1, borderColor: Colors.darkOrange, borderRadius: 4, paddingHorizontal: 5, paddingVertical: 4, marginRight: 5 }}>
-                    <Text style={{ fontSize: 12, color: Colors.darkOrange, fontWeight: "700" }}>{type.name}</Text>
-                  </View>
-                )
-              })}
-            </View>
+          <ScrollView style={{ marginTop: "auto" }} horizontal contentContainerStyle={{ paddingHorizontal: 11 }} showsHorizontalScrollIndicator={false} bounces={false}>
+            <View style={{ flexDirection: "row", marginTop: "auto" }}>
+                {item.filters.map((item: any) => {
+                  return (
+                    <Tag tag={item} style={{ marginRight: 5, paddingHorizontal: 5, paddingVertical: 4, fontSize: 12 }} />
+                  )
+                })}
+              </View>
+          </ScrollView>
           }
         </View>
       </ShopItemLargeContainer>
@@ -85,7 +86,6 @@ export function ShopItemLarge({ item, style, isPressTitle }: { item: any, style?
 }
 
 export function ShopItemRow({ item, style }: { item: any, style?: any })  {
-  const { t } = useTranslation();
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
 
   const openDetailPage = () => {

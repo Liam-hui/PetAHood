@@ -108,5 +108,19 @@ export default {
 
   nearby_heading: "附近",
   nearby_description: "好去處、商戶",
-  nearby_notGranted: "請允許存取你的位置"
+  nearby_notGranted: "請允許存取你的位置",
+
+  profile_level: "等級",
+  profile_fav: "我的收藏",
+  profile_reviews: "我的評論",
+  profile_footprint: "我的足印",
+  profile_voucher: "我的優惠券",
+  profile_orders: "我的訂單",
+
+  vouchers_active: "有效",
+  vouchers_redeemed: "已兌換",
+  vouchers_expired: "已過期",
+  vouchers_code: "優惠碼: ",
+  vouchers_period: "有效期: ",
+  vouchers_tAndC: "條款及細則"
 };

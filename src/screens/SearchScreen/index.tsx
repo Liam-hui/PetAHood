@@ -9,7 +9,7 @@ import Icon from '@/components/Icon';
 import SearchBar from '@/components/SearchBar';
 import Colors from '@/constants/Colors';
 import WideButton from '@/components/WideButton';
-import { getCommentsPicks, getRatingPicks, getShopQuickSearchResult, getShopSearchResult, resetShopQuickSearch, resetShopSearchFilter, setShopSearchFilter } from '@/store/shopSearch';
+import { getCommentsPicks, getRatingPicks, getShopQuickSearchResult, getShopSearchResult, resetShopQuickSearch } from '@/store/shopSearch';
 import { FilterTab } from './FilterTab';
 
 import { NearBy, BorderItem, BorderItemText, BorderItemWrapper } from './styles';
@@ -18,8 +18,9 @@ import { useTranslation } from 'react-i18next';
 import ShopList from '@/components/ShopList';
 import HotPicks from './HotPicks';
 import Layout from '@/constants/Layout';
-import { FilterNameType } from '@/types';
+import { FilterNameType, FilterType } from '@/types';
 import { ShopItemLarge, ShopItemRow } from '@/components/ShopItem';
+import { getFilterString, updatedFilter } from '@/utils/myUtils';
 
 export default function SearchScreen() {
   
@@ -43,36 +44,37 @@ export default function SearchScreen() {
   const ratingPicks = useAppSelector((state: RootState) => state.shopSearch.ratingPicks);
   const commentsPicks = useAppSelector((state: RootState) => state.shopSearch.commentsPicks);
 
-  // const [filter, setFilter] = useState<FilterType>({
-  //   districts: [],
-  //   petTypes: [],
-  //   needTypes: [],
-  //   specialCats: [],
-  // });
-  const filter = useAppSelector((state: RootState) => state.shopSearch.filter);
+  const [filter, setFilter] = useState<FilterType>({
+    districts: [],
+    petTypes: [],
+    needTypes: [],
+    specialCats: [],
+  });
   const [filterStringArray, setFilterStringArray] = useState<string[]>([]);
-  const filterString = useAppSelector((state: RootState) => state.shopSearch.filterString).reduce(
-    (previousValue, currentValue) => previousValue + (previousValue == "" ? "" : ", ") + currentValue
-  , "");
+  // const filterString = filterStringArray.reduce(
+  //   (previousValue, currentValue) => previousValue + (previousValue == "" ? "" : ", ") + currentValue
+  // , "");
+  const filterString = getFilterString(filter);
   const filterCount = Object.values(filter).reduce(
-  (prev, current) => {
-    return prev + current.length
-  }, 
-  0
-);
+    (prev, current) => {
+      return prev + current.length
+    }, 
+    0
+  );
 
   const updateFilter = (filterName: FilterNameType, items: { id: number, name: string }[], isForceAdd?: boolean) => {
-    dispatch(setShopSearchFilter({ filterName, items, isForceAdd }));
+    const result = updatedFilter(filter, filterStringArray, filterName, items, isForceAdd);
+    setFilter(result.filter);
+    setFilterStringArray(result.filterStringArray);
   }
 
   const resetFilter = () => {
-    // setFilter({
-    //   districts: [],
-    //   petTypes: [],
-    //   needTypes: [],
-    //   specialCats: [],
-    // });
-    dispatch(resetShopSearchFilter());
+    setFilter({
+      districts: [],
+      petTypes: [],
+      needTypes: [],
+      specialCats: [],
+    });
     setFilterStringArray([]);
   }
   

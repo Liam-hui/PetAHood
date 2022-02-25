@@ -22,10 +22,15 @@ import NearByScreen from '@/screens/NearByScreen';
 // setting
 import SettingScreen from '@/screens/Setting/SettingScreen';
 import LanguageScreen from '@/screens/Setting/LanguageScreen';
+import { useAppSelector } from '@/hooks';
+import { RootState } from '@/store';
 
 const Stack = createStackNavigator();
 
 const StackNavigator = () => {
+
+  const authStatus = useAppSelector((state: RootState) => state.auth.status);
+
   return (
     <Stack.Navigator 
     initialRouteName="Tabs"
@@ -41,7 +46,6 @@ const StackNavigator = () => {
         <Stack.Screen name="Tabs" component={BottomTabNavigator} options={{ headerShown: false }} />
         <Stack.Screen name="WebView" component={WebViewScreen} />
         <Stack.Screen name="Blog" component={BlogScreen} />
-        <Stack.Screen name="Profile" component={ProfileScreen} />
         {/* Shop Detail */}
         <Stack.Screen name="ShopDetail" component={ShopDetailScreen} />
         <Stack.Screen name="Photos" component={PhotosScreen} />
@@ -54,6 +58,11 @@ const StackNavigator = () => {
         {/* Setting */}
         <Stack.Screen name="Setting" component={SettingScreen} />
         <Stack.Screen name="Language" component={LanguageScreen} />
+        {authStatus == "success" && 
+          <>
+            <Stack.Screen name="Profile" component={ProfileScreen} />
+          </>
+        }
       </Stack.Group>
       <Stack.Group 
         screenOptions={{ 
@@ -62,8 +71,12 @@ const StackNavigator = () => {
           gestureDirection: "vertical",
         }}
       >
-        <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="AlbumModal" component={AlbumModalScreen} />
+        {authStatus != "success" && 
+          <>
+             <Stack.Screen name="Login" component={LoginScreen} />
+          </>
+        }
       </Stack.Group>
     </Stack.Navigator>
   );

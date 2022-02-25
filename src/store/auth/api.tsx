@@ -1,16 +1,37 @@
 import api from '@/api';
+import EncryptedStorage from 'react-native-encrypted-storage';
+import i18n from "i18next";
 
-export async function getBlogDetailsByIdApi(id: number) {
+export async function loginApi(email: string, password: string) {
+  var body = new FormData();
+  body.append('email', email);
+  body.append('password', password);
+
   try {
-    const { data } = await api.get('/blog/' + id);
-    return {
-      isSuccess: true,
-      data: data.payload,
+    const { data } = await api.post('/auth/login', body);
+    if (data.code == 0) {
+      await EncryptedStorage.setItem(
+        "token",
+        data.payload.access_token
+      );
+      return {
+        isSuccess: true,
+      }
     }
-  } catch (error) {
-    console.log(error);
+    else return {
+      isSuccess: false,
+      errorMsg: data.payload?.length ? data.payload[0] : i18n.t(('tryAgain'))
+    }
+  } catch (error: any) {
+    const errorMsg = 
+      error?.response?.data?.payload?.length 
+        ? error.response.data.payload[0] 
+        : error?.code
+          ? error.code
+          : i18n.t(('tryAgain'));
     return {
-      isSuccess: false
+      isSuccess: false,
+      errorMsg
     }
   }
 }

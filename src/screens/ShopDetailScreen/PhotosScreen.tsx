@@ -19,7 +19,7 @@ export default function PhotosScreen(props: RootStackScreenProps<'Photos'>) {
   const { navigation } = props;
   const { data, goto } = props.route.params;
 
-  const [index, setIndex] = useState(0);
+  const [index, setIndex] = useState(goto?.album == "customer" ? 1 : 0);
   const [routes] = useState([
     { key: 'shop', title: `${t("shopDetails_shopPhotos")}(${data.shop.length})`  },
     { key: 'customer', title: `${t("shopDetails_customerUpload")}(${data.customer.length})` },
@@ -28,7 +28,6 @@ export default function PhotosScreen(props: RootStackScreenProps<'Photos'>) {
 
   useEffect(() => {
     if (goto) {
-      setIndex(goto.album == "customer" ? 1 : 0);
       navigation.push("AlbumModal", { images: goto.album == "customer" ? data.customer : data.shop, index: goto.index });
     }
   }, [])
@@ -52,7 +51,7 @@ export default function PhotosScreen(props: RootStackScreenProps<'Photos'>) {
           />
         }
         onIndexChange={setIndex}
-        initialLayout={{ width: Layout.window.width }}
+        initialLayout={{ width: Layout.window.width * 0.5 }}
         style={{ flex: 1 }}
       />
 

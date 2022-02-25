@@ -22,21 +22,15 @@ import Svg, {
   Mask,
 } from 'react-native-svg';
 
+export default function FootprintGraph(props: any) {
 
-export type FootprintGraphType = {
-  id: string;
-  name: string;
-};
+  const { size, values } = props;
 
-// FootprintGraph({ data }: { data: FootprintGraphType[] })
-export default function FootprintGraph() {
-
-  const value1 = 1;
-  const value2 = 4;
-  const value3 = 3;
-  const dist = 10;
+  const div = 4;
+  const dist = 50 / div;
 
   const coor = (value: number, index: number) => {
+    value = value * div;
     const angle = index * Math.PI * 2 / 3 - Math.PI / 2;
     const x = (value * dist * Math.cos(angle)) + 50;
     const y = (value * dist * Math.sin(angle)) + 50;
@@ -45,28 +39,29 @@ export default function FootprintGraph() {
 
   return (
     <View>
-      <Svg height="200" width="200" viewBox="0 0 100 100">
+      <Svg height={size} width={size} viewBox="0 0 100 100">
         <Defs>
           <LinearGradient id="gradient" x1="0%" x2="100%" y1="0%" y2="100%" gradientUnits="userSpaceOnUse">
             <Stop offset="10%" stopColor="#F7682F"></Stop>
             <Stop offset="90%" stopColor="#FFCC3300" stopOpacity="0.5"></Stop>
           </LinearGradient>
         </Defs>
-        {Array.from({ length: 4 }).map((x, i) => 
+        {Array.from({ length: div }).map((x, i) => 
           <Ellipse
             cx="50"
             cy="50"
-            rx={(i + 1) * dist}
-            ry={(i + 1) * dist}
+            rx={50 * (i + 1) / div}
+            ry={50 * (i + 1) / div}
             stroke="#E5E5E5"
             strokeWidth="0.8"
+            strokeDasharray="5 5"
           />
         )}
-        <Line x1="0" y1="0" x2="100" y2="100" stroke="#E5E5E5" strokeWidth="0.8" />
-        <Line x1="0" y1="0" x2="100" y2="100" stroke="#E5E5E5" strokeWidth="0.8" />
-        <Line x1="0" y1="0" x2="100" y2="100" stroke="#E5E5E5" strokeWidth="0.8" />
+        <Line x1="50" y1="0" x2="50" y2="50" stroke="#E5E5E5" strokeWidth="0.8" strokeDasharray="5 5" />
+        {/* <Line x1="0" y1="0" x2="100" y2="100" stroke="#E5E5E5" strokeWidth="0.8" /> */}
+        {/* <Line x1="0" y1="0" x2="100" y2="100" stroke="#E5E5E5" strokeWidth="0.8" /> */}
         <Polygon
-          points={`${coor(value1, 0)} ${coor(value1, 1)} ${coor(value1, 2)}`}
+          points={`${coor(values[0], 0)} ${coor(values[1], 1)} ${coor(values[2], 2)}`}
           fill="url(#gradient)"
         />
       </Svg>

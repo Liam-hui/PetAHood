@@ -15,7 +15,8 @@ import { OptionBar, OptionButton, OptionText } from './styles';
 import FilterModal from './FilterModal';
 import SortingModal from './SortingModal';
 import SearchBar from '@/components/SearchBar';
-import { FilterType, SortingType } from '@/types';
+import { FilterNameType, FilterType, SortingType } from '@/types';
+import { getFilterString, updatedFilter } from '@/utils/myUtils';
 
 
 export default function SearchResult({ hideSearchBar }: { hideSearchBar?: boolean }) {
@@ -27,53 +28,77 @@ export default function SearchResult({ hideSearchBar }: { hideSearchBar?: boolea
   
   const searchStatus = useAppSelector((state: RootState) => state.shopSearch.status);
   const searchResult = useAppSelector((state: RootState) => state.shopSearch.result);
+  const params = useAppSelector((state: RootState) => state.shopSearch.params);
   const nextPage = useAppSelector((state: RootState) => state.shopSearch.nextPage);
 
   const [hasInit, setHasInit] = useState(false);
   const [isFilterVisible, setIsFilterVisible] = useState(false);
   const [isSortingVisible, setIsSortingVisible] = useState(false);
 
-  const [params, setParams] = useState<any>({});
+  // const [params, setParams] = useState<any>({});
   const [searchString, setSearchString] = useState("");
+  const [sorting, setSorting] = useState<SortingType | null>(null)
+  useEffect(() => {
+    if (hasInit) {
+      search();
+    }
+  }, [sorting])
+
   const [filter, setFilter] = useState<FilterType>({
     districts: [],
     petTypes: [],
     needTypes: [],
     specialCats: [],
   });
-  const [sorting, setSorting] = useState<SortingType | null>(null)
+  const [filterStringArray, setFilterStringArray] = useState<string[]>([]);
+  // const filterString = filterStringArray.reduce(
+  //   (previousValue, currentValue) => previousValue + (previousValue == "" ? "" : ", ") + currentValue
+  // , "");
+  const filterString = getFilterString(filter);
+
+  const updateFilter = (filterName: FilterNameType, items: { id: number, name: string }[], isForceAdd?: boolean) => {
+    const result = updatedFilter(filter, filterStringArray, filterName, items, isForceAdd);
+    setFilter(result.filter);
+    setFilterStringArray(result.filterStringArray);
+  }
+
+  const resetFilter = () => {
+    setFilter({
+      districts: [],
+      petTypes: [],
+      needTypes: [],
+      specialCats: [],
+    });
+    setFilterStringArray([]);
+  }
 
   useEffect(() => {
-    if (!hasInit && searchStatus == "success") {
-      const params = store.getState().shopSearch.params;
-      setParams(params);
-      if (params.searchString) {
-        setSearchString(params.searchString);
-      }
-      if (params.filter) {
-        setFilter(params.filter);
-      }
-      else {
-        let filter = {
-          districts: [],
-          petTypes: [],
-          needTypes: [],
-          specialCats: [],
-        };
-        if (params.regions) {
-          filter.districts = params.regions;
-        }
-        if (params.pets) {
-          filter.petTypes = params.pets;
-        }
-        if (params.cats) {
-          filter.needTypes = params.cats;
-        }
-        setFilter(filter);
-      }
-      setHasInit(true);
+    if (params.searchString) {
+      setSearchString(params.searchString);
     }
-  }, [searchStatus])
+    if (params.filter) {
+      setFilter(params.filter);
+    }
+    else {
+      let filter = {
+        districts: [],
+        petTypes: [],
+        needTypes: [],
+        specialCats: [],
+      };
+      if (params.regions) {
+        filter.districts = params.regions;
+      }
+      if (params.pets) {
+        filter.petTypes = params.pets;
+      }
+      if (params.cats) {
+        filter.needTypes = params.cats;
+      }
+      setFilter(filter);
+    }
+    setHasInit(true);
+  }, [params])
 
   const renderItem = ({ item }: { item: any }) => (
     <ShopItemLarge
@@ -129,6 +154,13 @@ export default function SearchResult({ hideSearchBar }: { hideSearchBar?: boolea
                   placeholder={t("search_shopName")}
                   onChangeText={setSearchString}
                   onSubmit={search}
+                  style={{ marginBottom: 10 }}
+                />
+                <SearchBar 
+                  value={filterString}
+                  placeholder={t("search_filter")}
+                  isTextDisabled
+                  isIconHidden
                 />
               </View>
             </View>
@@ -153,7 +185,7 @@ export default function SearchResult({ hideSearchBar }: { hideSearchBar?: boolea
 
       {searchStatus == "loading" && searchResult.length == 0 &&
         <View style={{ flex: 1, alignItems: "center", justifyContent: "center"}}>
-          <ActivityIndicator/>
+          <ActivityIndicator color="grey" />
         </View>
       }
 
@@ -177,31 +209,13 @@ export default function SearchResult({ hideSearchBar }: { hideSearchBar?: boolea
           }}
           onEndReached={onEndReached}
           onEndReachedThreshold={0.9}
-          // numColumns={2}
         />
       }
 
-      {/* <View style={{ width: "100%", position: "absolute", bottom: Layout.window.height * 0.18, alignItems: "center", opacity: 1 }}  pointerEvents="box-none" >
-        <TouchableOpacity
-          style={{
-            flexDirection: "row",
-            backgroundColor: Colors.orange,
-            paddingHorizontal: 24,
-            paddingVertical: 12,
-            borderRadius: 20,
-          }}
-          onPress={() => {
-            setIsFilterVisible(true);
-          }}
-        >
-          <Icon size={14} icon={require("@/assets/icons/icon-filter-white.png")} />
-          <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", marginLeft: 10 }} >{t("search_filters")}</Text>
-        </TouchableOpacity>
-      </View> */}
-
       <FilterModal
         filter={filter}
-        setFilter={setFilter}
+        updateFilter={updateFilter}
+        resetFilter={resetFilter}
         isVisible={isFilterVisible}
         close={() => setIsFilterVisible(false)}
         confirm={search}
@@ -210,7 +224,6 @@ export default function SearchResult({ hideSearchBar }: { hideSearchBar?: boolea
       <SortingModal
         isVisible={isSortingVisible}
         close={() => setIsSortingVisible(false)}
-        confirm={search}
         sorting={sorting}
         setSorting={setSorting}
       />

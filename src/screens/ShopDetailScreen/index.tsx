@@ -27,6 +27,8 @@ import { HOST } from '@/constants';
 import i18n from '@/translate/i18n';
 import HideAndShow from '@/components/HideAndShow';
 import { SvgUri } from 'react-native-svg';
+import Stars from '@/components/Stars';
+import Tag from '@/components/Tag';
 
 export default function ShopDetailScreen(props: RootStackScreenProps<'ShopDetail'>) {
 
@@ -163,7 +165,6 @@ export default function ShopDetailScreen(props: RootStackScreenProps<'ShopDetail
           }}
           renderSectionHeader={(props) => {
             const { section } = props;
-            console.log(props);
             if (section.title == "body") 
               return (
                 <View style={{ backgroundColor: isNavSticked ? "white" : Colors.lightBlue, width: "100%", paddingBottom: 15, ...isNavSticked && { ...Styles.shadowStyle } }}>
@@ -184,24 +185,6 @@ export default function ShopDetailScreen(props: RootStackScreenProps<'ShopDetail
 
     </View>
   );
-}
-
-const Stars = ({ stars }: { stars: number }) => {
-  return (
-    <View style={{ flexDirection: "row" }}>
-      {[...Array(5)].map((_, i) =>
-        <Icon
-          key={i}
-          icon={
-            stars > i 
-            ? require(`../../assets/icons/icon-star.png`)
-            : require(`../../assets/icons/icon-starEmpty.png`)
-          }
-          size={15}
-        />
-      )}
-    </View>
-  )
 }
 
 const TopCard = ({ data }: { data: any }) => {
@@ -234,11 +217,11 @@ const TopCard = ({ data }: { data: any }) => {
             style={{ width: "100%", height: "100%", borderRadius: 8 }} 
             source={{ uri: data.cover_image ? data.cover_image : data.albums[0]  }}
           />
-          {(data?.albums?.length > 0 || data?.comment_photos.length > 0) && 
+          {(data?.cover_image || data?.albums?.length > 0 || data?.comment_photos.length > 0) && 
             <TouchableOpacity
               activeOpacity={0.6}
               onPress={() => {
-                navigation.push("Photos", { data: { shop: data.albums, customer: data.comment_photos } });
+                navigation.push("Photos", { data: { shop: [data.cover_image].concat(data.albums), customer: data.comment_photos } });
               }}
               style={{ flexDirection: "row", backgroundColor: "#F1F5F9", borderRadius: 10, position: "absolute", bottom: 7, right: 6, paddingHorizontal: 8, paddingVertical: 10 }}
             >
@@ -438,8 +421,7 @@ const CustomerUpload = ({ data }: { data: any }) => {
               marginHorizontal: index % 3 == 1 ? 2 : 0
             }}
             onPress={() => {
-              navigation.push("Photos", { data: { shop: data.albums, customer: data.comment_photos }, goto: { album: "customer", index } });
-              // navigation.push("AlbumModal", { images: data.comment_photos, index: index });
+              navigation.push("Photos", { data: { shop: [data.cover_image].concat(data.albums), customer: data.comment_photos }, goto: { album: "customer", index } });
             }}
           >
             <FastImage 
@@ -597,10 +579,8 @@ const Tags = ({ data }: { data: any }) => {
     <Section>
       <Heading style={{ marginBottom: 10 }}>{t("shopDetails_tags")}</Heading>
       <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-        {data.tags.map((item: any) =>{
-          return <View style={{ marginBottom: 10, marginRight: 10, borderWidth: 1, borderColor: Colors.darkOrange, borderRadius: 4, padding: 5 }}>
-            <Text style={{ color: Colors.darkOrange, fontWeight: "bold" }}>{item.name}</Text>
-          </View>
+        {data.tags.map((tag: any) =>{
+          return <Tag tag={tag} style={{ marginBottom: 10, marginRight: 10 }} />
         })}
       </View>
       <DarkSep/>

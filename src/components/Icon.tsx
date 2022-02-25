@@ -1,10 +1,11 @@
 import * as React from 'react';
 import { Image, ImageSourcePropType, TouchableOpacity } from 'react-native';
+import FastImage, { Source } from 'react-native-fast-image';
 
-export default function Icon({ icon, size, onPress, style }: { icon: ImageSourcePropType; size: number, onPress?: () => void, style?: object }) {
+export default function Icon({ icon, size, onPress, style }: { icon: number | Source; size: number, onPress?: () => void, style?: object }) {
   if (onPress != null) return (
     <TouchableOpacity onPress={onPress} style={style!}>
-      <Image 
+      <FastImage 
         style={{ height: size, width: size }}
         resizeMode="contain"
         source={icon} 
@@ -12,7 +13,7 @@ export default function Icon({ icon, size, onPress, style }: { icon: ImageSource
     </TouchableOpacity>
   );
   else return (
-    <Image 
+    <FastImage 
       style={{ height: size, width: size, ...style! }}
       resizeMode="contain"
       source={icon} 

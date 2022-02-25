@@ -45,8 +45,8 @@ export default function Inspirations({ data }: { data: any[] }) {
     ) 
   }
 
-  return (
-    <>
+  if (data.length > 0) return (
+    <View style={{ paddingVertical: 20, backgroundColor: "white" }}>
       <Heading text={t("home_findInspiration")} icon={require('../../assets/icons/icon-claw.png')} style={{ marginLeft: Layout.page.paddingHorizontal }} />
       <Carousel
         data={data}
@@ -74,8 +74,9 @@ export default function Inspirations({ data }: { data: any[] }) {
         inactiveDotOpacity={0.3}
         inactiveDotScale={1}
       />
-    </>
+    </View>
   );
+  return null;
 }
 
 const Inspiration = ({ item, style }: { item: any, style?: object }) => {

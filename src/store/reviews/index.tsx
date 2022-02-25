@@ -3,12 +3,14 @@ import { RootState, AppThunk } from '@/store';
 import { getReviewsByIdApi } from './api';
 
 export interface ReviewsState {
-  status: 'idle' | 'loading' | 'failed';
+  hasInit: boolean,
+  status: 'idle' | 'loading' | 'failed' | 'success';
   data: any[];
   nextPage: number | null;
 }
 
 const initialState: ReviewsState = {
+  hasInit: false,
   status: 'idle',
   data: [],
   nextPage: null,
@@ -19,7 +21,7 @@ export const getReviewsById = createAsyncThunk(
   async (id: number, { getState }) => {
     const state = getState() as any;
     const { nextPage } = state.reviews;
-    const response = await getReviewsByIdApi(id, nextPage == null ? 0 : nextPage);
+    const response = await getReviewsByIdApi(id, nextPage == null ? 1 : nextPage);
     return { response };
   }
 );
@@ -28,6 +30,12 @@ export const reviewsSlice = createSlice({
   name: 'reviews',
   initialState,
   reducers: {
+    resetReviews: (state) => {
+      state.hasInit = false;
+      state.status = 'idle';
+      state.data = [];
+      state.nextPage = null;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -37,7 +45,10 @@ export const reviewsSlice = createSlice({
       .addCase(getReviewsById.fulfilled, (state, action) => {
         if (action.payload.response.isSuccess) {
           state.status = 'idle';
-          state.data = action.payload.response.data;
+          state.data = state.data.concat(action.payload.response.data);
+          state.nextPage = action.payload.response.nextPage;
+          if (!state.hasInit)
+            state.hasInit = true;
         }
         else {
           state.status = 'failed';
@@ -45,5 +56,8 @@ export const reviewsSlice = createSlice({
       })
   },
 });
+
+export const { resetReviews } = reviewsSlice.actions;
+
 
 export default reviewsSlice.reducer;

@@ -7,8 +7,42 @@ import { useTranslation } from "react-i18next";
 import { Text } from '@/components/Themed';
 import HomeScreen from '../screens/HomeScreen';
 import TabTwoScreen from '../screens/TabTwoScreen';
+import { useAppSelector } from '@/hooks';
+import { RootState, store } from '@/store';
+import { useSelector } from 'react-redux';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useNavigation } from '@react-navigation/native';
+import FastImage from 'react-native-fast-image';
 
 const BottomTab = createBottomTabNavigator();
+
+const ProfileIcon = () => {
+
+  const navigation = useNavigation<NativeStackNavigationProp<any>>();
+  const authStatus = useAppSelector((state: RootState) => state.auth.status);
+  const profile = useAppSelector((state: RootState) => state.profile.data);
+
+  return (
+    <TouchableOpacity
+      activeOpacity={0.6}
+      style={{ paddingHorizontal: 8, height: 55, justifyContent: "flex-end" }}
+      onPress={() => { 
+        if (authStatus == "success")
+          navigation.navigate('Profile'); 
+        else
+          navigation.navigate('Login'); 
+      }}
+    >
+      <FastImage 
+        style={{ width: 72, height: 72, borderRadius: 36, borderWidth: 2, borderColor: "white", overflow: "hidden", backgroundColor: "black", transform: [{ translateY: -4 }] }}
+        resizeMode="cover"
+        source={{ uri: authStatus == "success" && profile != null ? profile.profile_photo_url : "" }} 
+      />
+    </TouchableOpacity>
+  );
+
+}
+
 
 const BottomTabNavigator = () => {
   const { t } = useTranslation();
@@ -48,7 +82,9 @@ const BottomTabNavigator = () => {
 }
 
 const TabBar = (props: BottomTabBarProps) => {
+
   const { state, descriptors, navigation } = props;
+
   return (
     <SafeAreaInsetsContext.Consumer>
       {insets => <View style={{ flexDirection: 'row', alignItems: "center", backgroundColor: '#DB6865', height: 70 + (insets?.bottom ?? 0), paddingBottom: insets?.bottom }} >
@@ -77,20 +113,7 @@ const TabBar = (props: BottomTabBarProps) => {
             </TouchableOpacity>
           );
         })}
-        <TouchableOpacity
-          activeOpacity={0.6}
-          style={{ paddingHorizontal: 8, height: 55, justifyContent: "flex-end" }}
-          onPress={() => { 
-            navigation.navigate('Login'); 
-            // navigation.navigate('Profile'); 
-          }}
-        >
-          <Image 
-            style={{ width: 72, height: 72, borderRadius: 36, borderWidth: 2, borderColor: "white", overflow: "hidden", transform: [{ translateY: -4 }] }}
-            resizeMode="cover"
-            source={require('../assets/images/profile.png')} 
-          />
-        </TouchableOpacity>
+        <ProfileIcon/>
       </View>}
     </SafeAreaInsetsContext.Consumer>
   );

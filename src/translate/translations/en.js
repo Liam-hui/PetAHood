@@ -108,5 +108,19 @@ export default {
 
   nearby_heading: "Near By",
   nearby_description: "Services, Place-to-go, Shops",
-  nearby_notGranted: "Please allow location permissions"
+  nearby_notGranted: "Please allow location permissions",
+
+  profile_level: "Level",
+  profile_fav: "Favourite",
+  profile_reviews: "Reviews",
+  profile_footprint: "Footprint",
+  profile_voucher: "Voucher",
+  profile_orders: "Orders",
+
+  vouchers_active: "Active",
+  vouchers_redeemed: "Redeemed",
+  vouchers_expired: "Expired",
+  vouchers_code: "Promotion Code: ",
+  vouchers_period: "Valid Period: ",
+  vouchers_tAndC: "Terms & Conditions"
 };

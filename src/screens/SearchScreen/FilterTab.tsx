@@ -14,6 +14,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import { useTranslation } from 'react-i18next';
 import { t } from 'i18next';
 import { FilterNameType, FilterType } from '@/types';
+import SelectBar from '@/components/SelectBar';
 
 export function FilterTab({ filter, updateFilter }: { filter: FilterType, updateFilter: (filterName: FilterNameType, items: { id: number, name: string }[], isForceAdd?: boolean) => void }) {
 
@@ -86,37 +87,18 @@ const Tab = ({ filterName, filter, updateFilter }: { filterName: 'petTypes' | 's
 const TabWithSubcats = ({ filterName, filter, updateFilter }: { filterName: 'districts' | 'needTypes', filter: FilterType, updateFilter: (filterName: FilterNameType, items: { id: number, name: string }[], isForceAdd?: boolean) => void }) => {
 
   const data = useAppSelector((state: RootState) => state.shopSearch.filterList[filterName]);
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [selected, setSelected] = useState<string>(data[0].name);
 
   return (
     <TabContainer>
       {data.length > 0 && <>
-        <View style={{ height: 40, width: "100%" }}>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ flexDirection: "row", minWidth: "100%", justifyContent: "center", paddingHorizontal: Layout.page.paddingHorizontal }}>
-            {data.map((cat, index) => {
-              const isSelected = index == selectedIndex;
-              return (
-                <BorderItemLarge as={TouchableOpacity}
-                  key={index}
-                  onPress={() => setSelectedIndex(index)}
-                  style={{
-                    ... isSelected && { backgroundColor: Colors.orange }
-                  }}
-                >
-                  <BorderItemLargeText 
-                    style={{ 
-                      ... isSelected && { color: "white" } 
-                    }}
-                  >
-                    {cat.name}
-                  </BorderItemLargeText>
-                </BorderItemLarge>
-              )
-            })}
-          </ScrollView>
-        </View>
+        <SelectBar
+          items={data.map(x => { return { value: x.name, name: x.name } })}
+          value={selected}
+          select={(value: any) => setSelected(value)}
+        />
         <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingTop: 10, paddingHorizontal: Layout.page.paddingHorizontal }} showsVerticalScrollIndicator={false}>
-          {data[selectedIndex].subCats.map((subCat, index) => {
+          {data.find(x => x.name == selected)!.subCats.map((subCat, index) => {
             const items = subCat.items;
             return (
               <View key={index} style={{ marginBottom: 20 }}>

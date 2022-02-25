@@ -12,38 +12,22 @@ import Icon from '@/components/Icon';
 import HideAndShow from '@/components/HideAndShow';
 import { Border, MenuHeading, MenuItemText, FilterItem, FilterItemText } from './styles';
 import WideButton from '@/components/WideButton';
-import { resetShopSearchFilter, setShopSearchFilter } from '@/store/shopSearch';
 import { updatedFilter } from '@/utils/myUtils';
+import { Source } from 'react-native-fast-image';
 // import { TouchableOpacity } from 'react-native-gesture-handler';
 
-const FilterModal = ({ filter, setFilter, isVisible, close, confirm } : { filter: FilterType, setFilter: Dispatch<SetStateAction<FilterType>>, isVisible: boolean, close: () => void, confirm: () => void })  => {
+const FilterModal = ({ filter, updateFilter, resetFilter, isVisible, close, confirm } : { filter: FilterType, updateFilter: (filterName: FilterNameType, items: { id: number, name: string }[], isForceAdd?: boolean) => void, resetFilter: () => void, isVisible: boolean, close: () => void, confirm: () => void })  => {
 
-  const dispatch = useAppDispatch();
   const insets = useSafeAreaInsets();
 
   const filterList = useAppSelector((state: RootState) => state.shopSearch.filterList);
-  // const filter = useAppSelector((state: RootState) => state.shopSearch.filter);
-  // const [filter, setFilter] = useState<FilterType>({
-  //   districts: [],
-  //   petTypes: [],
-  //   needTypes: [],
-  //   specialCats: [],
-  // });
 
-  const updateFilter = (filterName: FilterNameType, items: { id: number, name: string }[], isForceAdd?: boolean) => {
-    setFilter(updatedFilter(filter, filterName, items, isForceAdd));
-    // dispatch(setShopSearchFilter({ filterName, items, isForceAdd }));
-  }
-
-  const resetFilter = () => {
-    dispatch(resetShopSearchFilter());
-    // setFilter({
-    //   districts: [],
-    //   petTypes: [],
-    //   needTypes: [],
-    //   specialCats: [],
-    // });
-  }
+  const filterCount = Object.values(filter).reduce(
+    (prev, current) => {
+      return prev + current.length
+    }, 
+    0
+  );
 
   const [isPickerShown, setIsPickerShown] = useState(false);
   const [pickerData, setPickerData] = useState<any>(null);
@@ -109,13 +93,13 @@ const FilterModal = ({ filter, setFilter, isVisible, close, confirm } : { filter
               filter={filter}
               filterName="specialCats"
               updateFilter={updateFilter}
-              name={t("search_petTypes")}
+              name={t("search_specialCats")}
               icon={require(`@/assets/icons/icon-specialType-black.png`)}
               data={filterList.specialCats}
             />
           </ScrollView>
           <WideButton
-            text={t("confirm")}
+             text={t('search_search') + (filterCount > 0 ? ` (${filterCount})` : "")}
             onPress={() => {
               confirm();
               close();
@@ -186,7 +170,7 @@ const PickerMenu = ({ data, close }: { data: any | null, close: () => void }) =>
   )
 }
 
-const FilterPicker = ({ filter, filterName, updateFilter, name, icon, data }: { filter: FilterType, filterName: "petTypes" | "specialCats", updateFilter: (filterName: FilterNameType, items: { id: number, name: string }[], isForceAdd?: boolean) => void, name: string, icon: ImageSourcePropType, data: any }) => {
+const FilterPicker = ({ filter, filterName, updateFilter, name, icon, data }: { filter: FilterType, filterName: "petTypes" | "specialCats", updateFilter: (filterName: FilterNameType, items: { id: number, name: string }[], isForceAdd?: boolean) => void, name: string, icon: number | Source , data: any }) => {
   return (
     <View>
       <HideAndShow
@@ -243,7 +227,7 @@ const FilterPicker = ({ filter, filterName, updateFilter, name, icon, data }: { 
   )
 }
 
-const FilterPickerWithSubcat = ({ filter, filterName, updateFilter, name, icon, openPicker, data }: { filter: FilterType, filterName: "districts" | "needTypes", updateFilter: (filterName: FilterNameType, items: { id: number, name: string }[], isForceAdd?: boolean) => void, name: string, icon: ImageSourcePropType, openPicker: (data: any) => void, data: any[] }) => {
+const FilterPickerWithSubcat = ({ filter, filterName, updateFilter, name, icon, openPicker, data }: { filter: FilterType, filterName: "districts" | "needTypes", updateFilter: (filterName: FilterNameType, items: { id: number, name: string }[], isForceAdd?: boolean) => void, name: string, icon: number | Source, openPicker: (data: any) => void, data: any[] }) => {
 
   const [cat, setCat] = useState(0);
   const [subCat, setSubCat] = useState(0);

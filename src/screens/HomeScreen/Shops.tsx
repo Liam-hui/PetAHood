@@ -5,10 +5,9 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import Heading from './Heading';
 import ShopList from '@/components/ShopList';
-import { getShopSearchResult, setShopSearchFilter } from '@/store/shopSearch';
+import { getShopSearchResult } from '@/store/shopSearch';
 import { useAppDispatch } from '@/hooks';
 import { useTranslation } from 'react-i18next';
-import { store } from '@/store';
 
 export default function Shops({ data }: { data: any[] }) {
 
@@ -17,16 +16,11 @@ export default function Shops({ data }: { data: any[] }) {
   const dispatch = useAppDispatch();
 
   const goToMore = (params: any) => {
-    // if (params.cats) {
-    //   const filterList = store.getState().shopSearch.filterList;
-      
-    //   dispatch(setShopSearchFilter(params));
-    // }
     dispatch(getShopSearchResult(params));
     navigation.navigate("SearchResult");
   }
 
-  return (
+  if (data.length > 0) return (
     <View style={{ marginVertical: 10 }}>
       {
         data.map((item: any) => {
@@ -49,4 +43,5 @@ export default function Shops({ data }: { data: any[] }) {
       }
     </View>
   );
+  return null;
 }

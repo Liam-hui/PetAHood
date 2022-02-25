@@ -9,7 +9,7 @@ export async function getReviewsByIdApi(id: number, page: number) {
       nextPage: data.payload.current_page < data.payload.last_page ? (data.payload.current_page + 1) : null
     }
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     return {
       isSuccess: false
     }

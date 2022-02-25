@@ -14,6 +14,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import counterReducer from './counter';
 import loadingReducer from './loading';
 import authReducer from './auth';
+import profileReducer from './profile';
 import homePageDataReducer from './homePageData';
 import shopDetailsReducer from './shopDetails';
 import shopSearchReducer from './shopSearch';
@@ -25,6 +26,7 @@ const persistConfig = {
   version: 1,
   storage: AsyncStorage,
   whitelist: ['homePageData', 'shopDetails', 'shopSearch', 'blogDetails']
+  // whitelist: ['homePageData', 'shopDetails', 'shopSearch', 'blogDetails', 'auth', 'profile']
 };
 
 const persistedReducer = persistReducer(
@@ -32,6 +34,7 @@ const persistedReducer = persistReducer(
   combineReducers({
     counter: counterReducer,
     auth: authReducer,
+    profile: profileReducer,
     loading: loadingReducer,
     homePageData: homePageDataReducer,
     shopDetails: shopDetailsReducer,

@@ -4,18 +4,18 @@ import { getHomePageButtonsApi, getHomePageBannersApi, getHomePageSlidersApi, ge
 
 export interface HomePageDataState {
   status: 'idle' | 'loading' | 'failed';
-  buttons: Object[];
-  banners: Object[];
-  sliders: Object[];
-  blogs: Object[];
+  buttons: Object[] | null;
+  banners: Object[] | null;
+  sliders: Object[] | null;
+  blogs: Object[] | null;
 }
 
 const initialState: HomePageDataState = {
   status: 'idle',
-  buttons: [],
-  banners: [],
-  sliders: [],
-  blogs: []
+  buttons: null,
+  banners: null,
+  sliders: null,
+  blogs: null
 };
 
 export const getHomePageButtons = createAsyncThunk(

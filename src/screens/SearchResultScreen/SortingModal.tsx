@@ -11,17 +11,15 @@ import Icon from '@/components/Icon';
 import { Border, MenuHeading, FilterItem, FilterItemText, MenuItemText } from './styles';
 import WideButton from '@/components/WideButton';
 
-const SortingModal = ({ isVisible, close, confirm, sorting, setSorting } : { isVisible: boolean, close: () => void, confirm: () => void, sorting: SortingType | null, setSorting: Dispatch<SetStateAction<SortingType | null>> })  => {
-
-  const reset = () => {
-    setSorting(null);
-  }
+const SortingModal = ({ isVisible, close, sorting, setSorting } : { isVisible: boolean, close: () => void, sorting: SortingType | null, setSorting: Dispatch<SetStateAction<SortingType | null>> })  => {
 
   const SortItem = ({ value }: { value: SortingType }) => {
     return (
       <TouchableOpacity
         style={{ height: 30, alignItems: "center", flexDirection: "row"}}
-        onPress={() => setSorting(value)}
+        onPress={() => {
+          setSorting(sorting == value ? null : value);
+        }}
       >
         <MenuItemText style={{}}>{t(`sort_${value}`)}</MenuItemText>
         <ChooseCircle isChosen={sorting == value}/>
@@ -48,7 +46,7 @@ const SortingModal = ({ isVisible, close, confirm, sorting, setSorting } : { isV
               onPress={close}
             />
           </View>
-          <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 20 }} showsVerticalScrollIndicator={false}>
+          <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 20 }} showsVerticalScrollIndicator={false} bounces={false}>
             <SortItem value="rating" />
             <Border/>
             <SortItem value="new" />
@@ -59,24 +57,6 @@ const SortingModal = ({ isVisible, close, confirm, sorting, setSorting } : { isV
             <Border/>
             <SortItem value="comment" />
           </ScrollView>
-          <WideButton
-            text={t("confirm")}
-            onPress={() => {
-              confirm();
-              close();
-            }}
-            color={Colors.darkOrange}
-          />
-          <WideButton
-            isBorder
-            text={t("reset")}
-            onPress={reset}
-            color={Colors.darkOrange}
-            style={{
-              marginTop: 15,
-              marginBottom: 20,
-            }}
-          />
         </SafeAreaView>
       </View>
     </Modal>

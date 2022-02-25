@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, ScrollView, TouchableOpacity } from 'react-native';
+import { View, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { SafeAreaInsetsContext } from 'react-native-safe-area-context';
 import { useNavigation, DrawerActions } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
@@ -17,19 +17,22 @@ import Colors from '@/constants/Colors';
 export default function HomeScreen() {
 
   const homePageData = useAppSelector((state: RootState) => state.homePageData);
+  const isFinished = homePageData.banners && homePageData.buttons && homePageData.sliders && homePageData.blogs;
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.lightBlue }}>
       <Header/>
-      <ScrollView>
-        <Banners data={homePageData.banners} />
-        <Buttons data={homePageData.buttons} />
-        <Shops data={homePageData.sliders} />
-        <View style={{ paddingVertical: 20, backgroundColor: "white" }}>
-          {/* <Banner source={require(`../../assets/images/banner.png`)} /> */}
-          <Inspirations data={homePageData.blogs} />
-        </View>
-      </ScrollView>
+      {isFinished
+        ? <ScrollView>
+            {homePageData.banners && <Banners data={homePageData.banners} />}
+            {homePageData.buttons && <Buttons data={homePageData.buttons} />}
+            {homePageData.sliders && <Shops data={homePageData.sliders} />}
+            {homePageData.blogs && <Inspirations data={homePageData.blogs} />}
+          </ScrollView>
+        : <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+            <ActivityIndicator color="grey" />
+          </View>
+      }
     </View>
   );
 }

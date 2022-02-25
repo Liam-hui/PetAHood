@@ -31,18 +31,6 @@ export const NumberText = styled.Text`
   margin-bottom: 8px;
 `;
 
-export const Shadow = styled.View`
-  backgroundColor: white;
-  shadowColor: black;
-  shadowOpacity: 0.27;
-  shadowRadius: 4.65;
-  elevation: 6;
-  width: 64px; 
-  height: 64px;
-  borderRadius: 32px;
-  marginRight: 10px;
-`;
-
 export const CircleImage = styled.Image`
   width: 64px; 
   height: 64px;

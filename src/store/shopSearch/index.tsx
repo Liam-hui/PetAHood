@@ -11,8 +11,6 @@ export interface ShopSearchState {
   history: string[];
   nextPage: number | null;
   params: any;
-  filter: FilterType;
-  filterString: string[];
   filterList: { 
     districts: { 
       name: string,
@@ -43,13 +41,6 @@ const initialState: ShopSearchState = {
   history: [],
   nextPage: null,
   params: {},
-  filter: {
-    districts: [],
-    petTypes: [],
-    needTypes: [],
-    specialCats: []
-  },
-  filterString: [],
   filterList: {
     districts: [],
     needTypes: [],
@@ -141,38 +132,11 @@ export const shopSearchSlice = createSlice({
     resetShopSearch: (state) => {
       state.status = "idle";
       state.result = [];
+      state.params = {};
       state.nextPage = null;
     },
     resetShopQuickSearch: (state) => {
       state.quickSearchResult = [];
-    },
-    resetShopSearchFilter: (state) => {
-      state.filter =  {
-        districts: [],
-        petTypes: [],
-        needTypes: [],
-        specialCats: []
-      };
-      state.filterString = [];
-    },
-    setShopSearchFilter: (state, action: PayloadAction<{ filterName: FilterNameType, items: { id: number, name: string }[], isForceAdd?: boolean }>) => {
-      const { filterName, items, isForceAdd } = action.payload;
-      let filter = { ...state.filter };
-      let filterString = state.filterString;
-      for (const { id, name } of items) {
-        const isSelected = filter[filterName].findIndex(x => x == id) != -1;
-        filter = {
-          ...filter,
-          [filterName]: isSelected
-            ? (isForceAdd ? filter[filterName] : filter[filterName].filter(x => x != id))
-            : filter[filterName].concat(id)
-        };
-        filterString = isSelected
-          ? (isForceAdd ? filterString : filterString.filter(x => x != name))
-          : filterString.concat(name);
-      }
-      state.filter = filter;
-      state.filterString = filterString;
     },
   },
   extraReducers: (builder) => {
@@ -201,9 +165,9 @@ export const shopSearchSlice = createSlice({
         state.status = 'loading';
       })
       .addCase(getShopSearchResult.fulfilled, (state, action) => {
+        state.params = action.payload.params;
         if (action.payload.response.isSuccess) {
           state.status = 'success';
-          state.params = action.payload.params;
           state.result = action.payload.response.result;
           state.nextPage = action.payload.response.nextPage;
           // add to history
@@ -256,14 +220,13 @@ export const shopSearchSlice = createSlice({
   },
 });
 
-export const { resetShopSearch, resetShopQuickSearch, setShopSearchFilter, resetShopSearchFilter } = shopSearchSlice.actions;
+export const { resetShopSearch, resetShopQuickSearch } = shopSearchSlice.actions;
 
 export const initShopSearch = (): AppThunk => (
   dispatch,
 ) => {
   dispatch(resetShopSearch());
   dispatch(resetShopQuickSearch());
-  dispatch(resetShopSearchFilter());
   dispatch(getDistricts());
   dispatch(getPetTypes());
   dispatch(getNeedTypes());

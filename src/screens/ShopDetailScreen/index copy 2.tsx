@@ -108,7 +108,7 @@ export default function ShopDetailScreen(props: RootStackScreenProps<'ShopDetail
 
       {status == "loading" && !data &&
         <View style={{ flex: 1, alignItems: "center", justifyContent: "center"}}>
-          <ActivityIndicator/>
+          <ActivityIndicator color="grey" />
         </View>
       }
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, Platform, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, Platform, TouchableOpacity, ScrollView, Modal, ActivityIndicator } from 'react-native';
 
 import { RootStackScreenProps } from '@/types';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -14,6 +14,10 @@ import Colors from '@/constants/Colors';
 import Checkbox from '@/components/Checkbox';
 import { TabView } from 'react-native-tab-view';
 import Layout from '@/constants/Layout';
+import { useAppDispatch, useAppSelector } from '@/hooks';
+import { login } from '@/store/auth';
+import { RootState } from '@/store';
+import EncryptedStorage from 'react-native-encrypted-storage';
 
 export default function LoginScreen(props: RootStackScreenProps<'Login'>) {
 
@@ -66,98 +70,163 @@ export default function LoginScreen(props: RootStackScreenProps<'Login'>) {
 const LoginTab = ({ goToSignup }: { goToSignup: () => void }) => {
 
   const { t } = useTranslation();
+  const dispatch = useAppDispatch();
   const insets = useSafeAreaInsets();
+
+  const isLoading = useAppSelector((state: RootState) => state.auth.isLoading);
+  const status = useAppSelector((state: RootState) => state.auth.status);
+  const errorMsg = useAppSelector((state: RootState) => state.auth.errorMsg);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isRemember, setIsRemember] = useState(false);
+  const [isErrorMsgShown, setIsErrorMsgShown] = useState(false);
+
+  useEffect(() => {
+    getCredentials();
+  }, [])
+
+  useEffect(() => {
+    setIsErrorMsgShown(false);
+  }, [email, password])
+
+  useEffect(() => {
+    if (!isLoading && status == "failed" && errorMsg != null) {
+      setIsErrorMsgShown(true);
+    }
+  }, [isLoading, status, errorMsg])
+
+
+  const getCredentials = async() => {
+    try {   
+      const credentials = await EncryptedStorage.getItem("credentials");
+      if (credentials != undefined) {
+        const credentialsParsed = JSON.parse(credentials);
+        setEmail(credentialsParsed?.email);
+        setPassword(credentialsParsed?.password);
+        setIsRemember(true);
+      }
+    } catch (error) {}
+  }
+
+  const loginPressed = async () => {
+    if (email != "" && password != "") {
+      dispatch(login({ email, password }));
+      if (isRemember) {
+        await EncryptedStorage.setItem(
+          "credentials",
+          JSON.stringify({
+            email,
+            password
+          })
+        );
+      }
+      else {
+        await EncryptedStorage.removeItem("credentials")
+      }
+    }
+  }
 
   return (
-    <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: insets.bottom + 15 }} showsVerticalScrollIndicator={false} bounces={false}>
-      <ContentContainer style={{ ...Styles.shadowStyle }}>
-        <Heading>{t("auth_login")}</Heading>
-        <FieldName>{t("auth_email")}<Text style={{ color: Colors.darkOrange }}>*</Text></FieldName>
-        <TextInput
-          value={email}
-          onChangeText={setEmail}
-          style={{ marginBottom: 20 }}
-        />
-        <FieldName>{t("auth_password")}<Text style={{ color: Colors.darkOrange }}>*</Text></FieldName>
-        <TextInput
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-          style={{ marginBottom: 20 }}
-        />
-        <View style={{ flexDirection: 'row', alignItems: "center", marginBottom: 20 }}>
-          <Checkbox
-            size={18}
-            value={isRemember}
-            onPress={() => setIsRemember(!isRemember)}
-            style={{ marginRight: 8 }}
+    <>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: insets.bottom + 15 }} showsVerticalScrollIndicator={false} bounces={false}>
+        <ContentContainer style={{ ...Styles.shadowStyle }}>
+          <Heading>{t("auth_login")}</Heading>
+          <FieldName>{t("auth_email")}<Text style={{ color: Colors.darkOrange }}>*</Text></FieldName>
+          <TextInput
+            value={email}
+            onChangeText={setEmail}
+            style={{ marginBottom: 20 }}
           />
-          <Text>{t("auth_rememberMe")}</Text>
-          <TouchableOpacity
-            style={{  marginLeft: "auto" }}
+          <FieldName>{t("auth_password")}<Text style={{ color: Colors.darkOrange }}>*</Text></FieldName>
+          <TextInput
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
+            style={{ marginBottom: 10 }}
+          />
+          <View pointerEvents='none' style={{ marginBottom: 20 }}>
+            <Text style={{ color: "grey", opacity: isErrorMsgShown ? 1 : 0 }}>{errorMsg?? " "}</Text>
+          </View>
+          <View style={{ flexDirection: 'row', alignItems: "center", marginBottom: 20 }}>
+            <Checkbox
+              size={18}
+              value={isRemember}
+              onPress={() => setIsRemember(!isRemember)}
+              style={{ marginRight: 8 }}
+            />
+            <Text>{t("auth_rememberMe")}</Text>
+            <TouchableOpacity
+              style={{  marginLeft: "auto" }}
+            >
+              <Text style={{ fontWeight: "bold", color: Colors.darkOrange }}>{t("auth_forgotPassword")}</Text>
+            </TouchableOpacity>
+          </View>
+          <WideButton
+            text={t("auth_login")}
+            onPress={loginPressed}
+            color={Colors.darkOrange}
+          />
+          <Text style={{ alignSelf: "center", marginVertical: 15 }}>{t("auth_or")}</Text>
+          <WideButton
+            isBorder
+            onPress={() => {
+
+            }}
+            color={"#030335"}
+            style={{
+              justifyContent: "flex-start",
+              paddingHorizontal: 15,
+              marginBottom: 15
+            }}
           >
-            <Text style={{ fontWeight: "bold", color: Colors.darkOrange }}>{t("auth_forgotPassword")}</Text>
-          </TouchableOpacity>
-        </View>
-        <WideButton
-          text={t("auth_login")}
-          onPress={() => {
+            <Icon
+              icon={require("@/assets/icons/icon-facebook2.png")}
+              size={20}
+              style={{ marginRight: 10 }}
+            />
+            <Text style={{ fontWeight: "bold" }}>{t("auth_fbSignin")}</Text>
+          </WideButton>
+          <WideButton
+            isBorder
+            onPress={() => {
 
-          }}
-          color={Colors.darkOrange}
-        />
-        <Text style={{ alignSelf: "center", marginVertical: 15 }}>{t("auth_or")}</Text>
-        <WideButton
-          isBorder
-          onPress={() => {
-
-          }}
-          color={"#030335"}
-          style={{
-            justifyContent: "flex-start",
-            paddingHorizontal: 15,
-            marginBottom: 15
-          }}
-        >
-          <Icon
-            icon={require("@/assets/icons/icon-facebook2.png")}
-            size={20}
-            style={{ marginRight: 10 }}
+            }}
+            color={"#030335"}
+            style={{
+              justifyContent: "flex-start",
+              paddingHorizontal: 15,
+            }}
+          >
+            <Icon
+              icon={require("@/assets/icons/icon-google.png")}
+              size={20}
+              style={{ marginRight: 10 }}
+            />
+            <Text style={{ fontWeight: "bold" }}>{t("auth_googleSignin")}</Text>
+          </WideButton>
+        </ContentContainer>
+        <ContentContainer style={{ ...Styles.shadowStyle, marginTop: 20 }}>
+          <WideButton
+            isBorder
+            text={t("auth_createAccount")}
+            onPress={goToSignup}
+            color={Colors.darkOrange}
           />
-          <Text style={{ fontWeight: "bold" }}>{t("auth_fbSignin")}</Text>
-        </WideButton>
-        <WideButton
-          isBorder
-          onPress={() => {
-
-          }}
-          color={"#030335"}
-          style={{
-            justifyContent: "flex-start",
-            paddingHorizontal: 15,
-          }}
+        </ContentContainer>
+      </ScrollView>
+      {isLoading && 
+        <Modal
+          animationType="fade"
+          visible={isLoading}
+          transparent
         >
-          <Icon
-            icon={require("@/assets/icons/icon-google.png")}
-            size={20}
-            style={{ marginRight: 10 }}
-          />
-          <Text style={{ fontWeight: "bold" }}>{t("auth_googleSignin")}</Text>
-        </WideButton>
-      </ContentContainer>
-      <ContentContainer style={{ ...Styles.shadowStyle, marginTop: 20 }}>
-        <WideButton
-          isBorder
-          text={t("auth_createAccount")}
-          onPress={goToSignup}
-          color={Colors.darkOrange}
-        />
-      </ContentContainer>
-    </ScrollView>
+          <View style={{ flex: 1, backgroundColor: "rgba(0, 0, 0, 0.5)", justifyContent: "center", alignItems: "center" }}>
+            <ActivityIndicator color="black" />
+          </View>
+        </Modal>
+      }
+    </>
   )
 }
 

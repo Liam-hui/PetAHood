@@ -4,7 +4,7 @@ import Colors from '@/constants/Colors';
 
 import Icon from './Icon';
 
-export default function SearchBar({ value, placeholder, onChangeText, onSubmit, isSelected, select, unselect, isTextDisabled, inputRef, style }: { value: string, placeholder: string, onChangeText?: (text: string) => void, onSubmit?: () => void, isSelected?: boolean, select?: () => void, unselect?: () => void, style?: object, isTextDisabled?: boolean, inputRef?: any }) {
+export default function SearchBar({ value, placeholder, onChangeText, onSubmit, isSelected, select, unselect, isTextDisabled, inputRef, isIconHidden, style }: { value: string, placeholder: string, onChangeText?: (text: string) => void, onSubmit?: () => void, isSelected?: boolean, isIconHidden?: boolean, select?: () => void, unselect?: () => void, style?: object, isTextDisabled?: boolean, inputRef?: any }) {
 
   return (
     <View
@@ -46,24 +46,25 @@ export default function SearchBar({ value, placeholder, onChangeText, onSubmit, 
         }
       </View>
 
-      {isSelected
-        ? <Icon
-            icon={require(`../assets/icons/icon-close.png`)}
-            size={12}
-            style={{ zIndex: 10, paddingHorizontal: 9, paddingVertical: 4 }}
-            onPress={() => {
-              Keyboard.dismiss();
-              unselect && unselect();
-            }}
-          />
-        : <Icon
-            icon={require(`../assets/icons/icon-search.png`)}
-            size={16}
-            style={{ paddingHorizontal: 5 }}
-            onPress={onSubmit ?? select}
-          />
-      }
-
+      {!isIconHidden && <>
+        {isSelected
+          ? <Icon
+              icon={require(`../assets/icons/icon-close.png`)}
+              size={12}
+              style={{ zIndex: 10, paddingHorizontal: 9, paddingVertical: 4 }}
+              onPress={() => {
+                Keyboard.dismiss();
+                unselect && unselect();
+              }}
+            />
+          : <Icon
+              icon={require(`../assets/icons/icon-search.png`)}
+              size={16}
+              style={{ paddingHorizontal: 5 }}
+              onPress={onSubmit ?? select}
+            />
+        }
+      </>}
 
     </View>
   );

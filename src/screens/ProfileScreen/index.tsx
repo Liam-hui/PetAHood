@@ -1,27 +1,53 @@
-import React, { useState } from 'react';
-import { View, Image, Text, ScrollView, useWindowDimensions } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Image, Text, ScrollView } from 'react-native';
 import { SafeAreaInsetsContext } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { StackActions } from '@react-navigation/native';
-import { TabView, TabBar, SceneMap, SceneRendererProps, NavigationState } from 'react-native-tab-view';
+import { TabView, SceneMap } from 'react-native-tab-view';
 
 import Icon from '../../components/Icon';
-import FootprintGraph from '../../components/FootprintGraph';
-import { Row, NameText, LinkText, LabelText, NumberText, Shadow, CircleImage, Border } from './styles';
+import { Row, NameText, LinkText, LabelText, NumberText, CircleImage, Border } from './styles';
+import { useAppDispatch, useAppSelector } from '@/hooks';
+import { logout } from '@/store/auth';
+import { RootState } from '@/store';
+import FastImage from 'react-native-fast-image';
+import Styles from '@/constants/Styles';
+import { useTranslation } from 'react-i18next';
+import TabBar from '@/components/TabBar';
+import { getUserProfileAll } from '@/store/profile';
+import Favourites from './Favourites';
+import Layout from '@/constants/Layout';
+import Reviews from './Reviews';
+import Vouchers from './Vouchers';
+import Footprint from './Footprint';
+import Colors from '@/constants/Colors';
 
 export default function ProfileScreen() {
+
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(getUserProfileAll());
+  }, [])
+
   return (
     <View style={{ flex: 1, backgroundColor: "#f8f8f8" }}>
       <Header/>
-      <MyTabView/>
+      <ProfileTabView/>
     </View>
   );
 }
 
 const Header = () => {
+
+  const { t } = useTranslation();
+  const dispatch = useAppDispatch();
   const navigation = useNavigation();
   const popAction = StackActions.pop(1);
+  const data = useAppSelector((state: RootState) => state.profile.data);
 
+  if (data == null)
+    return null;
   return (
     <SafeAreaInsetsContext.Consumer>
       {insets => <View style={{ backgroundColor: "white", paddingTop: 10 + insets?.top!, paddingBottom: 10, borderBottomLeftRadius: 26, borderBottomRightRadius: 26 }} >
@@ -47,27 +73,27 @@ const Header = () => {
             icon={require(`../../assets/icons/icon-setting.png`)}
             size={24}
             style={{ marginLeft: 7, marginRight: 5 }}
-            // onPress={() => navigation.dispatch(popAction) }
+            onPress={() => dispatch(logout()) }
           />
         </Row>
         <Row style={{ paddingHorizontal: 13 }}>
-          <View>
-            <Image 
-              style={{ width: 84, height: 84, borderRadius: 42, borderWidth: 2, borderColor: "white", overflow: "hidden", marginRight: 10 }}
+          <View style={{ alignItems: "center", marginRight: 10 }}>
+            <FastImage 
+              style={{ width: 84, height: 84, borderRadius: 42, borderWidth: 2, borderColor: "white", overflow: "hidden" }}
               resizeMode="cover"
-              source={require('../../assets/images/profile.png')} 
+              source={{ uri: data.profile_photo_url }} 
             />
-            <Row style={{ position: "absolute", bottom: 0, left: 9, width: 66, height: 18, borderRadius: 9, backgroundColor: "#F7682F", alignItems: "center", justifyContent: "center" }}>
+            <Row style={{ position: "absolute", bottom: -5, borderRadius: 15, backgroundColor: "#F7682F", alignItems: "center", justifyContent: "center", paddingHorizontal: 7, paddingVertical: 3 }}>
               <Icon
                 icon={require(`../../assets/icons/icon-claw-white.png`)}
                 size={14}
                 style={{ marginRight: 5 }}
               />
-              <Text style={{ color: "white", fontSize: 12, fontWeight: "bold" }}>Level 2</Text>
+              <Text style={{ color: "white", fontSize: 12, fontWeight: "bold" }}>{`${t("profile_level")} ${data.member_tier}`}</Text>
             </Row>
           </View>
           <View>
-            <NameText>Eleanor Pena</NameText>
+            <NameText>{data.first_name + " " + data.last_name}</NameText>
             <Row style={{ alignItems: "flex-end" }}>
               <Icon
                 icon={require(`../../assets/icons/icon-facebook.png`)}
@@ -86,25 +112,50 @@ const Header = () => {
             </Row>
           </View>
         </Row>
-        <ScrollView horizontal contentContainerStyle={{ paddingHorizontal: 13, paddingBottom: 10 }} >
+        <ScrollView horizontal contentContainerStyle={{ paddingHorizontal: 13, paddingBottom: 10 }} showsHorizontalScrollIndicator={false} bounces={false} >
           <Row style={{ marginTop: 10 }}>
-            <Shadow style={{ shadowOffset: { width: 0, height: 3 }, alignItems: "center", justifyContent: "center" }}>
+            <View 
+              style={{ 
+                alignItems: "center", 
+                justifyContent: "center",
+                backgroundColor: "white",
+                width: 64, 
+                height: 64,
+                borderRadius: 32,
+                ...Styles.shadowStyle,
+                shadowOpacity: 0.15,
+                marginRight: 15
+              }}
+            >
               <Icon
                 icon={require(`../../assets/icons/icon-add.png`)}
                 size={20}
               />
-            </Shadow>
-            {["", "", "", "", ""].map((item) => {
+            </View>
+            {data.pets.map((pet: any) => {
               return (
-                <Shadow style={{ shadowOffset: { width: 0, height: 3 } }}>
+                <View 
+                  style={{ 
+                    alignItems: "center", 
+                    justifyContent: "center",
+                    backgroundColor: "white",
+                    width: 64, 
+                    height: 64,
+                    borderRadius: 32,
+                    ...Styles.shadowStyle,
+                    shadowOpacity: 0.2,
+                    elevation: 6,
+                    marginRight: 8
+                  }}
+                >
                   <CircleImage
                     style={{ 
                       
                     }}
                     resizeMode="cover"
-                    source={require('../../assets/images/profile.png')} 
+                    source={{ uri: pet.image }} 
                   />
-                </Shadow>
+                </View>
               );
             })}
           </Row>
@@ -116,11 +167,11 @@ const Header = () => {
           <Row style={{ justifyContent: "space-between" }}>
             <View style={{ alignItems: "center" }}>
               <LabelText>Followers</LabelText>
-              <NumberText>103</NumberText>
+              <NumberText>0</NumberText>
             </View>
             <View style={{ alignItems: "center" }}>
-              <LabelText>Followers</LabelText>
-              <NumberText>103</NumberText>
+              <LabelText>Following</LabelText>
+              <NumberText>0</NumberText>
             </View>
           </Row>
         </View>
@@ -129,46 +180,41 @@ const Header = () => {
   );
 }
 
-const MyTabView = () => {
-  const layout = useWindowDimensions();
+const ProfileTabView = () => {
+
+  const { t } = useTranslation();
+
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([
-    { key: 'favourite', title: 'Favourite' },
-    { key: 'reviews', title: 'Reviews' },
-    { key: 'footprint', title: 'Footprint' },
-    { key: 'voucher', title: 'Voucher' },
-    { key: 'orders', title: 'Orders' },
+    { key: 'favourite', title: t("profile_fav") },
+    { key: 'reviews', title: t("profile_reviews") },
+    { key: 'footprint', title: t("profile_footprint") },
+    { key: 'voucher', title: t("profile_voucher") },
+    { key: 'orders', title: t("profile_orders") },
   ]);
 
   const renderScene = SceneMap({
-    favourite: () => <View style={{ flex: 1}} />,
-    reviews: () => <View style={{ flex: 1}} />,
-    footprint: () => <View style={{ flex: 1}} />,
-    // footprint: () => 
-    //   <View style={{ flex: 1}}>
-    //     <FootprintGraph/>
-    //   </View>,
-    voucher: () => <View style={{ flex: 1}} />,
+    favourite: () => <Favourites />,
+    reviews: () =>  <Reviews />,
+    footprint: () => <Footprint />,
+    voucher: () => <Vouchers />,
     orders: () => <View style={{ flex: 1}} />,
   });
 
   return (
     <TabView
-      style={{ marginTop: 10 }}
       navigationState={{ index, routes }}
       renderTabBar={props =>
-        <TabBar
-          {...props}
-          indicatorStyle={{ backgroundColor: "#F7682F", width: 0.5, height: 3 }}
-          style={{ backgroundColor: 'transparent' }}
-          labelStyle={{ fontSize: 18, textTransform: "none", fontWeight: "bold", color: "#F7682F" }}
-          tabStyle={{ width: 'auto', height: 40 }}
-          scrollEnabled={true}
-        />
+        <View style={{ marginBottom: 8 }}>
+          <TabBar
+            {...props}
+          />
+        </View>
       }
       renderScene={renderScene}
       onIndexChange={setIndex}
-      initialLayout={{ width: layout.width }}
+      initialLayout={{ width: Layout.window.width }}
+      style={{ backgroundColor: Colors.lightBlue }}
     />
   );
 }
