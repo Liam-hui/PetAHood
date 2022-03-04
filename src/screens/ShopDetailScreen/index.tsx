@@ -7,7 +7,7 @@ import Share from 'react-native-share';
 
 import Icon from '@/components/Icon';
 import ReadMoreText from '@/components/ReadMoreText';
-import ShopList from '@/components/ShopList';
+import { ShopList } from '@/components/ShopList';
 import { RootStackScreenProps } from '@/types';
 import { useAppSelector, useAppDispatch } from '@/hooks';
 import { getShopDetailById } from '@/store/shopDetails';
@@ -26,9 +26,9 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { HOST } from '@/constants';
 import i18n from '@/translate/i18n';
 import HideAndShow from '@/components/HideAndShow';
-import { SvgUri } from 'react-native-svg';
 import Stars from '@/components/Stars';
 import Tag from '@/components/Tag';
+import { toggleFav, userToggleFav } from '@/store/favourites';
 
 export default function ShopDetailScreen(props: RootStackScreenProps<'ShopDetail'>) {
 
@@ -98,7 +98,7 @@ export default function ShopDetailScreen(props: RootStackScreenProps<'ShopDetail
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "white" }}>
+    <View style={{ flex: 1, backgroundColor: data ? "white" : Colors.lightBlue }}>
 
       <Header 
         title={hasScroll ? data?.name : " "} 
@@ -106,12 +106,7 @@ export default function ShopDetailScreen(props: RootStackScreenProps<'ShopDetail
         isLeft
         action={
           <View style={{ flexDirection: "row" }}>
-            <Icon
-              icon={require(`../../assets/icons/icon-like.png`)}
-              size={24}
-              style={{ marginHorizontal: 5 }}
-              // onPress=
-            />
+            <FavIcon id={id} isFav={data?.fav_by_user!}/>
             <Icon
               icon={require(`../../assets/icons/icon-share.png`)}
               size={24}
@@ -185,6 +180,40 @@ export default function ShopDetailScreen(props: RootStackScreenProps<'ShopDetail
 
     </View>
   );
+}
+
+const FavIcon = (props: { id: number, isFav: boolean }) => {
+
+  const { id } = props;
+
+  const dispatch = useAppDispatch();
+  const authStatus = useAppSelector((state: RootState) => state.auth.status);
+  const favourites = useAppSelector((state: RootState) => state.favourites.ids);
+
+  const [isFav, setIsFav] = useState(authStatus == "success" ? props.isFav : favourites.findIndex(x => x == id) != -1);
+
+  useEffect(() => {
+    setIsFav(authStatus == "success" ? props.isFav : favourites.findIndex(x => x == id) != -1);
+  }, [props.isFav])
+
+  const fav = () => {
+    if (authStatus == "success") {
+      dispatch(userToggleFav(id));
+    }
+    else {
+      dispatch(toggleFav(id));
+    }
+    setIsFav(!isFav);
+  }
+
+  return (
+    <Icon
+      icon={isFav ? require(`../../assets/icons/icon-liked.png`) : require(`../../assets/icons/icon-like.png`)}
+      size={24}
+      style={{ marginHorizontal: 5 }}
+      onPress={fav}
+    />
+  )
 }
 
 const TopCard = ({ data }: { data: any }) => {
@@ -475,19 +504,11 @@ const Facilities = ({ data }: { data: any }) => {
       <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
         {data.facilities.map((item: any) =>{
           return <View style={{ marginBottom: 15, flexDirection: "row", alignItems: "center", width: "50%" }}>
-            {item.icon.endsWith("svg")
-              ? <SvgUri
-                  width={20}
-                  height={20}
-                  style={{ marginRight: 5 }}
-                  uri={item.icon}
-                />
-              :  <FastImage 
-                  style={{ height: 20, width: 20, marginRight: 5 }}
-                  resizeMode="contain"
-                  source={{ uri: item.icon }} 
-                />
-            }
+            <Icon
+              size={20}
+              icon={{ uri: item.icon }}
+              style={{ marginRight: 5 }}
+            />
             <Text>{item.name}</Text>
           </View>
         })}

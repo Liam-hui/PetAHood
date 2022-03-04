@@ -1,29 +1,42 @@
 import * as React from 'react';
 import { CardStyleInterpolators, createStackNavigator } from '@react-navigation/stack';
+import { useAppSelector } from '@/hooks';
+import { RootState } from '@/store';
 
 import BottomTabNavigator from './BottomTab';
 
 import WebViewScreen from '@/screens/WebViewScreen';
-import HomeScreen from '../screens/HomeScreen';
-import ProfileScreen from '../screens/ProfileScreen';
-import BlogScreen from '../screens/BlogScreen';
 import AlbumModalScreen from '../screens/AlbumModalScreen';
+import DialogScreen from '@/screens/DialogScreen';
+import BlogScreen from '../screens/BlogScreen';
+import AddNewLocationScreen from '@/screens/AddNewLocationScreen';
+import RegisterAsPartnerScreen from '@/screens/RegisterAsPartnerScreen';
+
+// Profile
+import ProfileScreen from '../screens/Profile/ProfileScreen';
+
+// Pet
+import PetScreen from '../screens/Pet/PetScreen';
+import AddPetScreen from '../screens/Pet/AddPetScreen';
+import PetGroomingFormScreen from '../screens/Pet/PetGroomingFormScreen';
+
 // auth
 import LoginScreen from '@/screens/Auth/LoginScreen';
+
 // shop details
 import ShopDetailScreen from '../screens/ShopDetailScreen';
 import PhotosScreen from '@/screens/ShopDetailScreen/PhotosScreen';
 import OpeningHourScreen from '@/screens/ShopDetailScreen/OpeningHourScreen';
 import ReviewsScreen from '@/screens/ShopDetailScreen/ReviewsScreen';
+
 // search
 import SearchScreen from '../screens/SearchScreen';
 import SearchResultScreen from '@/screens/SearchResultScreen';
 import NearByScreen from '@/screens/NearByScreen';
+
 // setting
 import SettingScreen from '@/screens/Setting/SettingScreen';
 import LanguageScreen from '@/screens/Setting/LanguageScreen';
-import { useAppSelector } from '@/hooks';
-import { RootState } from '@/store';
 
 const Stack = createStackNavigator();
 
@@ -33,7 +46,7 @@ const StackNavigator = () => {
 
   return (
     <Stack.Navigator 
-    initialRouteName="Tabs"
+      initialRouteName="Tabs"
       screenOptions={{ 
         headerShown: false,
       }}
@@ -46,6 +59,7 @@ const StackNavigator = () => {
         <Stack.Screen name="Tabs" component={BottomTabNavigator} options={{ headerShown: false }} />
         <Stack.Screen name="WebView" component={WebViewScreen} />
         <Stack.Screen name="Blog" component={BlogScreen} />
+        <Stack.Screen name="RegisterAsPartner" component={RegisterAsPartnerScreen} />
         {/* Shop Detail */}
         <Stack.Screen name="ShopDetail" component={ShopDetailScreen} />
         <Stack.Screen name="Photos" component={PhotosScreen} />
@@ -60,7 +74,11 @@ const StackNavigator = () => {
         <Stack.Screen name="Language" component={LanguageScreen} />
         {authStatus == "success" && 
           <>
+            {/* Profile */}
             <Stack.Screen name="Profile" component={ProfileScreen} />
+
+            <Stack.Screen name="Pet" component={PetScreen} />
+            <Stack.Screen name="AddNewLocation" component={AddNewLocationScreen} />
           </>
         }
       </Stack.Group>
@@ -77,6 +95,20 @@ const StackNavigator = () => {
              <Stack.Screen name="Login" component={LoginScreen} />
           </>
         }
+        {authStatus == "success" && 
+          <>
+            <Stack.Screen name="AddPet" component={AddPetScreen} />
+            <Stack.Screen name="PetGroomingForm" component={PetGroomingFormScreen} />
+          </>
+        }
+      </Stack.Group>
+      <Stack.Group 
+        screenOptions={{ 
+          presentation: 'transparentModal',
+          gestureEnabled: false,
+        }}
+      >
+        <Stack.Screen name="Dialog" component={DialogScreen} />
       </Stack.Group>
     </Stack.Navigator>
   );

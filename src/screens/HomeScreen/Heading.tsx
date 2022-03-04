@@ -1,23 +1,17 @@
 import React from 'react';
 import { View, ImageSourcePropType } from 'react-native';
 import Icon from '@/components/Icon';
-import { SvgUri } from 'react-native-svg';
 
 import { HeadingText } from './styles';
+import { Source } from 'react-native-fast-image';
 
-export default function Heading({ icon, svgIcon, text, style }: { icon?: ImageSourcePropType, svgIcon?: string, text: string, style?: object }) {
+export default function Heading({ icon, text, style }: { icon?: Source | number, text: string, style?: object }) {
   return (
     <View style={{ flexDirection: "row", marginVertical: 10, alignItems: "center", ...style! }}>
       {icon && <Icon
         size={20}
         style={{ marginRight: 4 }}
         icon={icon} 
-      />}
-      {svgIcon && <SvgUri
-        width={20}
-        height={20}
-        style={{ marginRight: 4 }}
-        uri={svgIcon}
       />}
       <HeadingText>{text}</HeadingText>
     </View>

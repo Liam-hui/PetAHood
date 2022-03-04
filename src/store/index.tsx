@@ -11,10 +11,12 @@ import {
 } from 'redux-persist'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import counterReducer from './counter';
+import resourcesReducer from './resources';
 import loadingReducer from './loading';
 import authReducer from './auth';
 import profileReducer from './profile';
+import favouritesReducer from './favourites';
+import petsReducer from './pets';
 import homePageDataReducer from './homePageData';
 import shopDetailsReducer from './shopDetails';
 import shopSearchReducer from './shopSearch';
@@ -25,16 +27,17 @@ const persistConfig = {
   key: 'root',
   version: 1,
   storage: AsyncStorage,
-  whitelist: ['homePageData', 'shopDetails', 'shopSearch', 'blogDetails']
-  // whitelist: ['homePageData', 'shopDetails', 'shopSearch', 'blogDetails', 'auth', 'profile']
+  whitelist: ['resources', 'homePageData', 'shopDetails', 'shopSearch', 'blogDetails', 'auth', 'profile', 'favourites']
 };
 
 const persistedReducer = persistReducer(
   persistConfig, 
   combineReducers({
-    counter: counterReducer,
     auth: authReducer,
+    resources: resourcesReducer,
     profile: profileReducer,
+    favourites: favouritesReducer,
+    pets: petsReducer,
     loading: loadingReducer,
     homePageData: homePageDataReducer,
     shopDetails: shopDetailsReducer,

@@ -8,6 +8,10 @@ import Colors from "@/constants/Colors";
 import StackNavigator from './Stack';
 import i18n from '@/translate/i18n';
 import Layout from '@/constants/Layout';
+import { useAppSelector } from '@/hooks';
+import { RootState } from '@/store';
+import { HOST } from '@/constants';
+import FastImage from 'react-native-fast-image';
 
 const Drawer = createDrawerNavigator();
 
@@ -16,7 +20,7 @@ const DrawerNavigaor = () => {
     <Drawer.Navigator 
       initialRouteName="Stack"
       screenOptions={{
-        headerShown: false
+        headerShown: false,
       }}
       drawerContent={props => <DrawerContent {...props}/>}
     >
@@ -26,9 +30,12 @@ const DrawerNavigaor = () => {
 }
 
 const DrawerContent = (props: DrawerContentComponentProps) => {
+
   const { navigation } = props;
   const { t } = useTranslation();
   const lang = i18n.language == "en" ? "en" : "zh_HK";
+  const authStatus = useAppSelector((state: RootState) => state.auth.status);
+  const adv = useAppSelector((state: RootState) => state.homePageData.adv);
   const [isScroll, setIsScroll] = useState(false);
 
   return (
@@ -63,16 +70,26 @@ const DrawerContent = (props: DrawerContentComponentProps) => {
           <DrawerItem
             icon={require(`../assets/icons/icon-drawerItem-location.png`)}
             label={t("drawerItem_location")}
-            onPress={() => {}}
+            onPress={() => {
+              if (authStatus == "success" ) {
+                navigation.navigate("AddNewLocation");
+              }
+              else {
+                navigation.navigate("Dialog", { message: t("pleaseLogin") });
+              }
+            }}
           />
           <View style={styles.border} />
-          <View style={{  paddingHorizontal: 24, height: 100 }}>
-            <Image
-              style={{ width: "100%", height: "100%", resizeMode: "contain" }}
-              source={require("../assets/images/banner.png")}
-            />
-          </View>
-          <View style={styles.border} />
+          {adv && adv.length > 0 && <>
+            <View style={{  paddingHorizontal: 24, height: 100 }}>
+              <FastImage
+                style={{ width: "100%", height: "100%" }}
+                source={{ uri: adv![0]?.image[0]?.path }}
+                resizeMode="contain"
+              />
+            </View>
+            <View style={styles.border} />
+          </>}
           <DrawerItem
             icon={require(`../assets/icons/icon-contactUs.png`)}
             label={t("drawerItem_contactUs")}
@@ -82,14 +99,14 @@ const DrawerContent = (props: DrawerContentComponentProps) => {
             icon={require(`../assets/icons/icon-aboutUs.png`)}
             label={t("drawerItem_aboutUs")}
             onPress={() => {
-              navigation.navigate("WebView", { url: `https://petahood.com/${lang}/page/about-us`, heading: t("drawerItem_aboutUs") });
+              navigation.navigate("WebView", { url: `${HOST}${lang}/page/about-us`, heading: t("drawerItem_aboutUs") });
             }}
           />
           <DrawerItem
             icon={require(`../assets/icons/icon-terms.png`)}
             label={t("drawerItem_tAndC")}
             onPress={() => {
-              navigation.navigate("WebView", { url: `https://petahood.com/${lang}/page/terms-and-conditions`, heading: t("drawerItem_tAndC") });
+              navigation.navigate("WebView", { url: `${HOST}${lang}/page/terms-and-conditions`, heading: t("drawerItem_tAndC") });
             }}
           />
           <View style={styles.border} />
@@ -97,21 +114,21 @@ const DrawerContent = (props: DrawerContentComponentProps) => {
             icon={require(`../assets/icons/icon-registerPartner.png`)}
             label={t("drawerItem_registerPartner")}
             onPress={() => {
-              navigation.navigate("WebView", { url: `https://petahood.com/${lang}/partner`, heading: t("drawerItem_registerPartner") });
+              navigation.navigate("RegisterAsPartner");
             }}
           />
           <DrawerItem
             icon={require(`../assets/icons/icon-termsMerchant.png`)}
             label={t("drawerItem_termsMerchant")}
             onPress={() => {
-              navigation.navigate("WebView", { url: `https://petahood.com/${lang}/page/merchant-services-tnc`, heading: t("drawerItem_termsMerchant") });
+              navigation.navigate("WebView", { url: `${HOST}${lang}/page/merchant-services-tnc`, heading: t("drawerItem_termsMerchant") });
             }}
           />
           <DrawerItem
             icon={require(`../assets/icons/icon-faq.png`)}
             label={t("drawerItem_faq")}
             onPress={() => {
-              navigation.navigate("WebView", { url: `https://petahood.com/${lang}/page/merchant-faq`, heading: t("drawerItem_faq") });
+              navigation.navigate("WebView", { url: `${HOST}${lang}/page/merchant-faq`, heading: t("drawerItem_faq") });
             }}
           />
           <View style={styles.border} />

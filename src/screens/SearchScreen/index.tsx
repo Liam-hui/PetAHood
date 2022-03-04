@@ -15,7 +15,6 @@ import { FilterTab } from './FilterTab';
 import { NearBy, BorderItem, BorderItemText, BorderItemWrapper } from './styles';
 import { hideLoading, showLoading } from '@/store/loading';
 import { useTranslation } from 'react-i18next';
-import ShopList from '@/components/ShopList';
 import HotPicks from './HotPicks';
 import Layout from '@/constants/Layout';
 import { FilterNameType, FilterType } from '@/types';
@@ -168,42 +167,46 @@ export default function SearchScreen() {
           size={24}
           style={{ position: "absolute" , left: 10, bottom: 15 }}
           onPress={() => navigation.dispatch(popAction)}
-          // onPress={() => isFilterOn ? setIsFilterOn(false) : navigation.dispatch(popAction) }
         />
         <Image 
           style={{ height: 40 }}
           resizeMode="contain"
           source={require('../../assets/images/logo.png')} 
         />
-        {/* <Icon
-          icon={require(`../../assets/icons/icon-filter.png`)}
-          size={24}
-          onPress={isFilterOn ? undefined : () => setIsFilterOn(true) }
-          style={{ opacity: isFilterOn ? 0 : 1}}
-        /> */}
       </View>
 
       <View style={{ flex: 1 }}>
 
         {/* search bars */}
-        <View style={{ backgroundColor: "white", paddingHorizontal: 20 }}>
-          <SearchBar 
-            inputRef={searchInputRef}
-            value={searchString}
-            placeholder={t("search_shopName")}
-            onChangeText={setSearchString}
-            onSubmit={search}
-            isSelected={mode == "search"}
-            select={() => {
-              setMode("search");
+        <View style={{ backgroundColor: "white", paddingHorizontal: 20, paddingBottom: 15, flexDirection: "row", alignItems: "center" }}>
+          <TouchableOpacity
+            style={{ flexDirection: "row", alignItems: "center", width: 90, paddingRight: 5 }}
+            onPress={() => {
+              setMode(mode == "filter" ? null: "filter");
             }}
-            unselect={() => {
-              setMode(null);
-              setSearchString("");
-            }}
-            style={{ marginBottom: 10 }}
-          />
-          <SearchBar 
+          >
+            <Text numberOfLines={1} style={{ flex: 1 }}>{filterString == "" ? t("search_filter") : filterString}</Text>
+            <Icon icon={require("@/assets/icons/icon-downArrow-orange.png")} size={15} style={{ transform: [{ rotate: mode == "filter" ? "180deg" : "0deg" }] }} />
+          </TouchableOpacity>
+          <View style={{ flex: 1 }}>
+            <SearchBar 
+              inputRef={searchInputRef}
+              value={searchString}
+              placeholder={t("search_shopName")}
+              onChangeText={setSearchString}
+              onSubmit={search}
+              isSelected={mode == "search"}
+              select={() => {
+                setMode("search");
+              }}
+              unselect={() => {
+                setMode(null);
+                setSearchString("");
+              }}
+              style={{  }}
+            />
+          </View>
+          {/* <SearchBar 
             value={filterString}
             placeholder={t("search_filter")}
             isSelected={mode == "filter"}
@@ -216,7 +219,7 @@ export default function SearchScreen() {
             }}
             style={{ marginBottom: 15 }}
             isTextDisabled
-          />
+          /> */}
         </View>
 
         {(mode == null || (mode == "search" && searchString == "")) &&

@@ -37,7 +37,7 @@ export default function SearchResult({ hideSearchBar }: { hideSearchBar?: boolea
 
   // const [params, setParams] = useState<any>({});
   const [searchString, setSearchString] = useState("");
-  const [sorting, setSorting] = useState<SortingType | null>(null)
+  const [sorting, setSorting] = useState<SortingType>("rating")
   useEffect(() => {
     if (hasInit) {
       search();
@@ -154,13 +154,6 @@ export default function SearchResult({ hideSearchBar }: { hideSearchBar?: boolea
                   placeholder={t("search_shopName")}
                   onChangeText={setSearchString}
                   onSubmit={search}
-                  style={{ marginBottom: 10 }}
-                />
-                <SearchBar 
-                  value={filterString}
-                  placeholder={t("search_filter")}
-                  isTextDisabled
-                  isIconHidden
                 />
               </View>
             </View>
@@ -174,7 +167,7 @@ export default function SearchResult({ hideSearchBar }: { hideSearchBar?: boolea
                 </OptionButton>
                 <OptionButton as={TouchableOpacity} onPress={() => setIsSortingVisible(true)}>
                   <Icon size={17} icon={require("../../assets/icons/icon-sorting-red.png")}/>
-                  <OptionText style={{ marginLeft: 10 }}>{t('search_sortBy')}</OptionText>
+                  <OptionText style={{ marginLeft: 10 }}>{sorting == null ? t('search_sortBy') : t(`sort_${sorting}`)}</OptionText>
                   <Icon size={17} icon={require("../../assets/icons/icon-downArrowOrange.png")}/>
                 </OptionButton>
               </OptionBar>

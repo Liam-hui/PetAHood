@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Text, Image, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import FastImage from 'react-native-fast-image'
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
@@ -54,7 +54,7 @@ export function ShopItemLarge({ item, style, isPressTitle }: { item: any, style?
               </TouchableOpacity>
               {/* rating */}
               <View style={{ flexDirection: "row", marginLeft: "auto" }}>
-                <Image 
+                <FastImage 
                   style={{ width: 14, height: 14, marginRight: 2, marginLeft: 5 }}
                   source={require('../../assets/icons/icon-star.png')} 
                 />
@@ -64,7 +64,7 @@ export function ShopItemLarge({ item, style, isPressTitle }: { item: any, style?
             </View>
             {/* location */}
             {item.district?.name &&
-              <Text style={{ color: "#7F7F7F", fontSize: 12, marginTop: 8 }}>{`${item.district.name}/ ${t("shopItem_distancePre")}${item.distance_in_km.toFixed(1)}${t("shopItem_distanceSuf")}`}</Text>
+              <Text style={{ color: "#7F7F7F", fontSize: 12, marginTop: 8 }} numberOfLines={1}>{`${item.district.name}/ ${t("shopItem_distancePre")}${item.distance_in_km.toFixed(1)}${t("shopItem_distanceSuf")}`}</Text>
             }
           </View>
           {/* type */}
@@ -120,7 +120,7 @@ export function ShopItemRow({ item, style }: { item: any, style?: any })  {
             </TouchableOpacity>
             {/* rating */}
             <View style={{ flexDirection: "row", marginLeft: "auto", alignItems: "center" }}>
-              <Image 
+              <FastImage 
                 style={{ width: 14, height: 14, marginRight: 2, marginLeft: 5 }}
                 source={require('../../assets/icons/icon-star.png')} 
               />
@@ -189,7 +189,7 @@ export function ShopItem({ item, style }: { item: any, style?: any })  {
             }
           </View>
           <View style={{ flexDirection: "row", marginTop: "auto" }}>
-            <Image 
+            <FastImage 
               style={{ width: 14, height: 14, marginRight: 4 }}
               source={require('../../assets/icons/icon-star.png')} 
             />

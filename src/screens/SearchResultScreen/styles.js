@@ -4,7 +4,7 @@ import Layout from '@/constants/Layout';
 
 export const OptionBar = styled.View`
   flex-direction: row;
-  width: ${Layout.window.width}px;
+  width: 100%;
   justify-content: space-around;
   padding-horizontal: 15px;
 `;
@@ -57,5 +57,14 @@ export const Border = styled.View`
   margin-vertical: 20px;
 `;
 
-
+export const Dropdown = styled.View`
+  borderWidth: 1px;
+  borderColor: #CCCCCC;
+  borderRadius: 5px;
+  width: ${Layout.window.width * 0.3}px;
+  flexDirection: row;
+  alignItems: center;
+  paddingHorizontal: 10px;
+  paddingVertical: 10px;
+`
 

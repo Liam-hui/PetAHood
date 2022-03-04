@@ -1,26 +1,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Linking, Platform, ActivityIndicator, FlatList, InteractionManager } from 'react-native';
 import { useTranslation } from "react-i18next";
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
-import FastImage from 'react-native-fast-image'
-import moment from 'moment';
-
-import Icon from '@/components/Icon';
-import ReadMoreText from '@/components/ReadMoreText';
-import HideAndShow from '@/components/HideAndShow';
-import ShopList from '@/components/ShopList';
 import { RootStackScreenProps } from '@/types';
 import { useAppSelector, useAppDispatch } from '@/hooks';
-import { getShopDetailById } from '@/store/shopDetails';
 import { RootState } from '@/store';
 import Colors from '@/constants/Colors';
 
-import { InfoRow, InfoText, Card, Sep, Section, Heading, DarkSep } from './styles';
 import Layout from '@/constants/Layout';
 import Header from '@/components/Header';
-import TabBar from '@/components/TabBar';
-import { TabView } from 'react-native-tab-view';
-import Styles from '@/constants/Styles';
 import Review from '@/components/Review';
 import { getReviewsById, resetReviews } from '@/store/reviews';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';

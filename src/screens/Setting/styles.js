@@ -6,9 +6,9 @@ export const SettingItem = styled.TouchableOpacity`
   flex-direction: row;
   align-items: center;
   padding-horizontal: 24px;
-  padding-vertical: 15px;
+  padding-vertical: 13px;
   background-color: #FFFFFF;
-  margin-vertical: 1px;
+  margin-vertical: 0.5px;
 `;
 
 export const SettingItemText = styled.Text`

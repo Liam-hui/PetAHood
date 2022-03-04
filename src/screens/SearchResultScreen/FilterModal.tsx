@@ -1,20 +1,21 @@
-import React, { useState, useEffect, useMemo, Dispatch, SetStateAction  } from 'react';
-import { View, Text, ScrollView, ImageSourcePropType, Modal, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect, useMemo, useRef, useCallback, useLayoutEffect } from 'react';
+import { View, Text, ScrollView, Modal, TouchableOpacity } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { t } from 'i18next';
+import { BottomSheetFlatList, BottomSheetFlatListMethods } from "@gorhom/bottom-sheet";
 
-import { useAppSelector, useAppDispatch } from '@/hooks';
+import { useAppSelector } from '@/hooks';
 import { RootState } from '@/store';
 import { FilterNameType, FilterType } from '@/types';
 import Colors from '@/constants/Colors';
 import Layout from '@/constants/Layout';
 import Icon from '@/components/Icon';
 import HideAndShow from '@/components/HideAndShow';
-import { Border, MenuHeading, MenuItemText, FilterItem, FilterItemText } from './styles';
+import { Border, MenuHeading, MenuItemText, FilterItem, FilterItemText, Dropdown } from './styles';
 import WideButton from '@/components/WideButton';
-import { updatedFilter } from '@/utils/myUtils';
 import { Source } from 'react-native-fast-image';
-// import { TouchableOpacity } from 'react-native-gesture-handler';
+import { Picker, PickerIOS } from '@react-native-community/picker';
+import BottomSheet from '@/components/BottomSheet';
 
 const FilterModal = ({ filter, updateFilter, resetFilter, isVisible, close, confirm } : { filter: FilterType, updateFilter: (filterName: FilterNameType, items: { id: number, name: string }[], isForceAdd?: boolean) => void, resetFilter: () => void, isVisible: boolean, close: () => void, confirm: () => void })  => {
 
@@ -29,15 +30,14 @@ const FilterModal = ({ filter, updateFilter, resetFilter, isVisible, close, conf
     0
   );
 
-  const [isPickerShown, setIsPickerShown] = useState(false);
+  const [isPickerVisible, setIsPickerVisible] = useState(false);
   const [pickerData, setPickerData] = useState<any>(null);
   const openPicker = (data: any) => {
-    setIsPickerShown(true);
     setPickerData(data);
+    setIsPickerVisible(true);
   }
   const closePicker = () => {
-    setIsPickerShown(false);
-    setPickerData(null);
+    setIsPickerVisible(false);
   }
 
   return (
@@ -118,55 +118,73 @@ const FilterModal = ({ filter, updateFilter, resetFilter, isVisible, close, conf
           />
         </SafeAreaView>
       </View>
-      {isPickerShown && <PickerMenu data={pickerData} close={closePicker} />}
+      <BottomSheet
+        points={[300]}
+        isOpen={isPickerVisible}
+        close={() => setIsPickerVisible(false)}
+      >
+        {pickerData && <PickerMenu data={pickerData} close={closePicker} />}
+      </BottomSheet>
     </Modal>
   );
 }
 
 const PickerMenu = ({ data, close }: { data: any | null, close: () => void }) => {
 
+  const insets = useSafeAreaInsets();
   const [selected, setSelected] = useState(data.selected);
 
+  const listRef = useRef<BottomSheetFlatListMethods>(null);
+
+  const scrollToSelected = useCallback(() => {
+    listRef.current?.scrollToIndex({ index: data.items.findIndex((x: any) => x.value == selected) });
+  }, []);
+
+  const renderItem = useCallback(
+    ({ item }) => (
+      <TouchableOpacity
+        style={{
+          height: 30,
+          flexDirection: 'row',
+          alignItems: "center",
+          paddingHorizontal: 10,
+        }}
+        onPress={() => {
+          setSelected(item.value);
+          data.selectItem(item.value);
+          close();
+        }}
+      >
+        <Text style={{ color: "#999999", fontSize: 14, flex: 1, fontWeight: item.value == selected ? "bold" : "normal" }} numberOfLines={1} >{item.label}</Text>
+        {item.value == selected &&
+          <Icon
+            icon={require(`@/assets/icons/icon-tick.png`)}
+            size={12}
+          />
+        }
+      </TouchableOpacity>
+    ) 
+  ,[]);
+
   return(
-    <View
-      style={{ width: "100%", height: "100%", backgroundColor: "rgba(0, 0, 0, 0.5)", position: "absolute", paddingHorizontal: 25, justifyContent: "center" }}
-    >
-      <TouchableOpacity 
-        style={{ width: "100%", height: "100%", position: "absolute" }} 
-        onPress={close}
+    <>
+      <BottomSheetFlatList 
+        ref={listRef}
+        style={{ marginTop: 20, marginBottom: insets.bottom }} 
+        contentContainerStyle={{ paddingHorizontal: 10 }}
+        data={data.items}
+        keyExtractor={((item: any, index: number) => String(index))}
+        renderItem={renderItem}
+        // initialScrollIndex={data.items.findIndex((x: any) => x.value == selected)}
+        onScrollToIndexFailed={(error) => {}}
+        getItemLayout={(data, index) => (
+          {length: 30, offset: 30 * index, index}
+        )}
+        onContentSizeChange={(w, h) => {
+          setTimeout(() => scrollToSelected(), 500);
+        }}
       />
-      {data != null &&
-        <View style={{ backgroundColor: "white" }}>
-          <ScrollView>
-            {data.items.map(({ label, value }: { label: string, value: number }, index: number) => {
-              return (
-                <TouchableOpacity
-                  key={index}
-                  style={{
-                    height: 30,
-                    flexDirection: 'row',
-                    alignItems: "center",
-                    paddingHorizontal: 10,
-                  }}
-                  onPress={() => {
-                    setSelected(value);
-                    data.selectItem(value);
-                  }}
-                >
-                  <Text style={{ color: "#999999", fontSize: 14, flex: 1 }} numberOfLines={1} >{label}</Text>
-                  {value == selected &&
-                    <Icon
-                      icon={require(`@/assets/icons/icon-tick.png`)}
-                      size={12}
-                    />
-                  }
-                </TouchableOpacity>
-              )
-            })}
-          </ScrollView>
-        </View>
-      }
-    </View>
+    </>
   )
 }
 
@@ -231,8 +249,6 @@ const FilterPickerWithSubcat = ({ filter, filterName, updateFilter, name, icon, 
 
   const [cat, setCat] = useState(0);
   const [subCat, setSubCat] = useState(0);
-  const [isDropDownOpen, setIsDropDownOpen] = useState(false);
-  const [closeDropdown, setCloseDropdown] = useState(0); // trigger when number update
 
   const cats = useMemo(() => {
     if (data) {
@@ -262,17 +278,8 @@ const FilterPickerWithSubcat = ({ filter, filterName, updateFilter, name, icon, 
     return [];
   }, [cat, subCat])
 
-  // const onDropdownOpen = () => {
-  //   setIsDropDownOpen(true);
-  //   setCloseDropdown(closeDropdown + 1);
-  // }
-
-  // const onDropdownClose = () => {
-  //   setIsDropDownOpen(false);
-  // }
-
   return (
-    <View style={{ zIndex: isDropDownOpen ? 999 : 1 }}>
+    <View>
       <HideAndShow
         shownElement={
           <>
@@ -283,10 +290,6 @@ const FilterPickerWithSubcat = ({ filter, filterName, updateFilter, name, icon, 
             <MenuItemText style={{ marginLeft: 8, marginRight: 5 }}>{name}</MenuItemText>
           </>
         }
-        style={{
-          zIndex: isDropDownOpen ? 999 : 1
-        }}
-        onHide={() => setCloseDropdown(closeDropdown + 1)}
       >
         <View style={{ flexDirection: "column-reverse" }}>
           <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", marginTop: 10 }}>
@@ -346,122 +349,22 @@ const FilterPickerWithSubcat = ({ filter, filterName, updateFilter, name, icon, 
 }
 
 const DropdownPicker = ({ selected, items, selectItem, openPicker, style }: { selected: number, items: { label: string, value: number }[], selectItem: (value: number) => void, openPicker: (data: any) => void, style?: any } ) => {
+  
   return (
-    <TouchableOpacity
-      style={{
-        borderWidth: 1,
-        borderColor: "#CCCCCC",
-        borderRadius: 5,
-        width: Layout.window.width * 0.3,
-        flexDirection: "row",
-        alignItems: "center",
-        paddingHorizontal: 10,
-        paddingVertical: 10,
-        ...style
-      }}
-      onPress={() => openPicker({ items, selectItem, selected })}
-    >
-      <Text style={{ color: "#999999", fontSize: 14, flex: 1 }} numberOfLines={2}>{items[selected]!.label}</Text>
-      <Icon
-        icon={require(`@/assets/icons/icon-downArrow-orange.png`)}
-        size={16}
-        style={{ marginLeft: "auto" }}
-      />
-    </TouchableOpacity>
+    <>
+      <Dropdown as={TouchableOpacity}
+        style={{ ...style! }}
+        onPress={() => openPicker({ items, selectItem, selected })}
+      >
+        <Text style={{ color: "#999999", fontSize: 14, flex: 1 }} numberOfLines={1}>{items[selected]!.label}</Text>
+        <Icon
+          icon={require(`@/assets/icons/icon-downArrow-orange.png`)}
+          size={16}
+          style={{ marginLeft: "auto" }}
+        />
+      </Dropdown>
+    </>
   )
 }
-
-// const DropdownPicker = ({ selected, items, selectItem, onOpen, onClose, closeDropdown, style }: { selected: number, items: { label: string, value: number }[], selectItem: (value: number) => void, onOpen: () => void, onClose: () => void, closeDropdown: any, style?: any } ) => {
-
-//   const [isOpen, setIsOpen] = useState(false);
-
-//   useEffect(() => {
-//     setIsOpen(false)
-//   }, [closeDropdown])
-
-//   const toggle = () => {
-//     if (isOpen) {
-//       setIsOpen(false);
-//       onClose();
-//     }
-//     else {
-//       onOpen();
-//       setTimeout(() => setIsOpen(true), 100);
-//     }
-//   }
-
-//   const height = 35;
-
-//   return (
-//     <View style={{ ...style }}>
-//       <TouchableOpacity
-//         style={{
-//           borderWidth: 1,
-//           borderColor: "#CCCCCC",
-//           borderRadius: 5,
-//           height: height,
-//           width: Layout.window.width * 0.3,
-//           flexDirection: "row",
-//           alignItems: "center",
-//           paddingHorizontal: 10,
-//         }}
-//         onPress={toggle}
-//       >
-//         <Text style={{ color: "#999999", fontSize: 14, flex: 1 }} numberOfLines={2}>{items[selected]!.label}</Text>
-//         <Icon
-//           icon={require(`@/assets/icons/icon-downArrow-orange.png`)}
-//           size={16}
-//           style={{ marginLeft: "auto", transform: [{ rotateZ: isOpen ? "180deg" : "0deg" }] }}
-//         />
-//       </TouchableOpacity>
-//       {isOpen &&
-//         <View
-//           style={{
-//             position: "absolute",
-//             top: height,
-//             width: "100%",
-//             backgroundColor: "white",
-//             borderColor: "#CCCCCC",
-//             borderWidth: 1,
-//             borderTopWidth: 0,
-//             borderBottomLeftRadius: 5,
-//             borderBottomRightRadius: 5,
-//             // maxHeight: height * 3,
-//           }}
-//         >
-//           <>
-//             {/* <ScrollView nestedScrollEnabled> */}
-//               {items.map(({ label, value }: { label: string, value: number }, index) => {
-//                 return (
-//                   <TouchableOpacity
-//                     key={index}
-//                     style={{
-//                       // position: "absolute",
-//                       // top: height * index,
-//                       width: "100%",
-//                       height: height,
-//                       flexDirection: 'row',
-//                       alignItems: "center",
-//                       paddingHorizontal: 10,
-//                     }}
-//                     onPress={() => selectItem(value)}
-//                   >
-//                     <Text style={{ color: "#999999", fontSize: 14, flex: 1 }} numberOfLines={1} >{label}</Text>
-//                     {/* {value == selected &&
-//                       <Icon
-//                         icon={require(`@/assets/icons/icon-tick.png`)}
-//                         size={12}
-//                       />
-//                     } */}
-//                   </TouchableOpacity>
-//                 )
-//               })}
-//             {/* </ScrollView> */}
-//           </>
-//         </View>
-//       }
-//     </View>
-//   )
-// }
 
 export default FilterModal;

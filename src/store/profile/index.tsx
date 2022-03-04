@@ -51,9 +51,9 @@ export const getUserProfileFav = createAsyncThunk(
   async (params: any, { getState }) => {
     const state = getState() as any;
     const { favNextPage } = state.profile;
-    const page = params.isInit ? 1 : favNextPage == null ? 1 : favNextPage;
-    const response = await getUserProfileFavApi(params, page);
-    return { response, isInit: params.isInit };
+    const { isInit } = params;
+    const response = await getUserProfileFavApi(params, isInit ? 1 : favNextPage);
+    return { response, isInit };
   }
 );
 

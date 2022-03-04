@@ -3,11 +3,11 @@ import { View, Text, TouchableOpacity} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-import Heading from './Heading';
-import ShopList from '@/components/ShopList';
+import Heading from './Heading';;
 import { getShopSearchResult } from '@/store/shopSearch';
 import { useAppDispatch } from '@/hooks';
 import { useTranslation } from 'react-i18next';
+import { ShopList } from '@/components/ShopList';
 
 export default function Shops({ data }: { data: any[] }) {
 
@@ -27,7 +27,7 @@ export default function Shops({ data }: { data: any[] }) {
           return (
             <View key={item.slider_id}>
               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: "space-between" }}>
-                <Heading text={item.title} svgIcon={item.icon} style={{ marginLeft: 15 }} />
+                <Heading text={item.title} icon={{ uri: item.icon }} style={{ marginLeft: 15 }} />
                 <TouchableOpacity 
                   activeOpacity={0.6}
                   style={{ marginRight: 15 }}  

@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState, AppThunk } from '@/store';
-import { getHomePageButtonsApi, getHomePageBannersApi, getHomePageSlidersApi, getHomePageBlogsApi } from './api';
+import { getHomePageButtonsApi, getHomePageBannersApi, getHomePageSlidersApi, getHomePageBlogsApi, getHomePageAdvApi } from './api';
 
 export interface HomePageDataState {
   status: 'idle' | 'loading' | 'failed';
@@ -8,6 +8,7 @@ export interface HomePageDataState {
   banners: Object[] | null;
   sliders: Object[] | null;
   blogs: Object[] | null;
+  adv: any[] | null;
 }
 
 const initialState: HomePageDataState = {
@@ -15,7 +16,8 @@ const initialState: HomePageDataState = {
   buttons: null,
   banners: null,
   sliders: null,
-  blogs: null
+  blogs: null,
+  adv: null
 };
 
 export const getHomePageButtons = createAsyncThunk(
@@ -46,6 +48,14 @@ export const getHomePageBlogs = createAsyncThunk(
   'getHomePageBlogs',
   async () => {
     const response = await getHomePageBlogsApi();
+    return response;
+  }
+);
+
+export const getHomePageAdv = createAsyncThunk(
+  'getHomePageAdv',
+  async () => {
+    const response = await getHomePageAdvApi();
     return response;
   }
 );
@@ -92,7 +102,16 @@ export const homePageDataSlice = createSlice({
         if (action.payload.isSuccess) {
           state.blogs = action.payload.data;
         }
-      });
+      })
+      .addCase(getHomePageAdv.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(getHomePageAdv.fulfilled, (state, action) => {
+        state.status = 'idle';
+        if (action.payload.isSuccess) {
+          state.adv = action.payload.data;
+        }
+      })
   },
 });
 
@@ -105,6 +124,7 @@ export const getHomePageData = (): AppThunk => (
   dispatch(getHomePageBanners());
   dispatch(getHomePageSliders());
   dispatch(getHomePageBlogs());
+  dispatch(getHomePageAdv());
 };
 
 export default homePageDataSlice.reducer;

@@ -9,6 +9,7 @@ import { useAppSelector } from '@/hooks';
 import Banners from './Banners';
 import Buttons from './Buttons';
 import Shops from './Shops';
+import Adv from './Adv';
 import Inspirations from './Inspirations';
 import Icon from '@/components/Icon';
 import SearchBar from '@/components/SearchBar';
@@ -27,6 +28,7 @@ export default function HomeScreen() {
             {homePageData.banners && <Banners data={homePageData.banners} />}
             {homePageData.buttons && <Buttons data={homePageData.buttons} />}
             {homePageData.sliders && <Shops data={homePageData.sliders} />}
+            {homePageData.adv && <Adv data={homePageData.adv} />}
             {homePageData.blogs && <Inspirations data={homePageData.blogs} />}
           </ScrollView>
         : <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>

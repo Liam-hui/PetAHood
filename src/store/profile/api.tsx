@@ -64,7 +64,6 @@ export async function getUserProfileFavApi(params?: any, page?: number) {
         }
       }
     );
-    console.log(data.payload);
     return {
       isSuccess: true,
       data: data.payload.data,

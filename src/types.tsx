@@ -11,10 +11,17 @@ declare global {
 export type RootStackParamList = {
   Root: NavigatorScreenParams<RootTabParamList> | undefined;
   Login: undefined,
-  Profile: undefined,
+  Pet: { id: number }
   Blog: { id: number }
   AlbumModal: { images: any[], index?: number }
+  Dialog: { message: string, confirm?: any, confirmText?: string, cancel?: any, cancelText?: string }
+  AddNewLocation: undefined,
+  RegisterAsPartner: undefined,
   WebView: { url: string, heading?: string };
+  // Profile
+  Profile: undefined,
+  AddPet: undefined,
+  PetGroomingForm: { petId: number, itemId?: number, data: any | null },
   // Shop Detail
   ShopDetail: { id: number },
   Photos: { data: any, goto?: { album: string, index: number } },
@@ -35,6 +42,8 @@ export type RootStackScreenProps<Screen extends keyof RootStackParamList> = Stac
 >;
 
 export type RootTabParamList = {
+  Home: undefined,
+  Wishlist: undefined,
   TabOne: undefined;
   TabTwo: undefined;
 };
@@ -54,3 +63,5 @@ export type FilterType = {
 export type FilterNameType = "districts" | "petTypes" | "needTypes" | "specialCats";
 
 export type SortingType = "rating" | "new" | "az" | "za" | "comment";
+
+export type Status = "idle" | "loading" | "success" | "failed";

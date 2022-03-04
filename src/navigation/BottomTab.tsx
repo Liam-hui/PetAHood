@@ -1,51 +1,57 @@
-import * as React from 'react';
+import React, { useEffect } from 'react';
 import { View, Image, TouchableOpacity, ImageSourcePropType } from 'react-native';
 import { createBottomTabNavigator, BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { SafeAreaInsetsContext } from 'react-native-safe-area-context';
 import { useTranslation } from "react-i18next";
+import { getHomePageData } from '@/store/homePageData';
+import { initShopSearch } from '@/store/shopSearch';
+import { clearUserProfile, getUserProfile } from '@/store/profile';
+import { refreshToken, resetAuth } from '@/store/auth';
+import { getAllResources } from '@/store/resources';
 
 import { Text } from '@/components/Themed';
 import HomeScreen from '../screens/HomeScreen';
+import WishlistScreen from '../screens/WishlistScreen';
 import TabTwoScreen from '../screens/TabTwoScreen';
-import { useAppSelector } from '@/hooks';
-import { RootState, store } from '@/store';
-import { useSelector } from 'react-redux';
+import { useAppDispatch, useAppSelector } from '@/hooks';
+import { RootState } from '@/store';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
 import FastImage from 'react-native-fast-image';
 
 const BottomTab = createBottomTabNavigator();
 
-const ProfileIcon = () => {
+const BottomTabNavigator = () => {
 
+  const { t } = useTranslation();
+  const dispatch = useAppDispatch();
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
   const authStatus = useAppSelector((state: RootState) => state.auth.status);
-  const profile = useAppSelector((state: RootState) => state.profile.data);
 
-  return (
-    <TouchableOpacity
-      activeOpacity={0.6}
-      style={{ paddingHorizontal: 8, height: 55, justifyContent: "flex-end" }}
-      onPress={() => { 
-        if (authStatus == "success")
-          navigation.navigate('Profile'); 
-        else
-          navigation.navigate('Login'); 
-      }}
-    >
-      <FastImage 
-        style={{ width: 72, height: 72, borderRadius: 36, borderWidth: 2, borderColor: "white", overflow: "hidden", backgroundColor: "black", transform: [{ translateY: -4 }] }}
-        resizeMode="cover"
-        source={{ uri: authStatus == "success" && profile != null ? profile.profile_photo_url : "" }} 
-      />
-    </TouchableOpacity>
-  );
+  useEffect(() => {
+    if (authStatus == "success") {
+      dispatch(refreshToken());
+    }
+    dispatch(getAllResources());
+    dispatch(getHomePageData());
+    dispatch(initShopSearch());
+  }, [])
 
-}
+  useEffect(() => {
+    // clear profile
+    if (authStatus == "success") {
+      dispatch(getUserProfile());
+    }
+    else {
+      dispatch(clearUserProfile());
+    }
 
-
-const BottomTabNavigator = () => {
-  const { t } = useTranslation();
+    // show popup if need login again
+    if (authStatus == 'needLoginAgain') {
+      navigation.navigate("Dialog", { message: t("pleaseLoginAgain") });
+      dispatch(resetAuth());
+    }
+  }, [authStatus])
 
   return (
     <BottomTab.Navigator
@@ -69,7 +75,7 @@ const BottomTabNavigator = () => {
       />
       <BottomTab.Screen
         name="Favourites"
-        component={TabTwoScreen}
+        component={WishlistScreen}
         options={{ title: t("bottomTabItem_favourites") }}
       />
       <BottomTab.Screen
@@ -128,6 +134,33 @@ const TabBarIcons: { [key: string]: ImageSourcePropType } = {
   "FavouritesFocused": require("../assets/icons/icon-tabBarItem-favourites-focused.png"),
   "Community": require("../assets/icons/icon-tabBarItem-community.png"),
   "CommunityFocused": require("../assets/icons/icon-tabBarItem-community.png"),
+}
+
+const ProfileIcon = () => {
+
+  const navigation = useNavigation<NativeStackNavigationProp<any>>();
+  const authStatus = useAppSelector((state: RootState) => state.auth.status);
+  const profile = useAppSelector((state: RootState) => state.profile.data);
+
+  return (
+    <TouchableOpacity
+      activeOpacity={0.6}
+      style={{ paddingHorizontal: 8, height: 55, justifyContent: "flex-end" }}
+      onPress={() => { 
+        if (authStatus == "success")
+          navigation.navigate('Profile'); 
+        else
+          navigation.navigate('Login'); 
+      }}
+    >
+      <FastImage 
+        style={{ width: 72, height: 72, borderRadius: 36, borderWidth: 2, borderColor: "white", overflow: "hidden", backgroundColor: "black", transform: [{ translateY: -4 }] }}
+        resizeMode="cover"
+        source={{ uri: authStatus == "success" && profile != null ? profile.profile_photo_url : "" }} 
+      />
+    </TouchableOpacity>
+  );
+
 }
 
 export default BottomTabNavigator;

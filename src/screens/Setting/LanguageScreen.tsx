@@ -7,6 +7,7 @@ import Header from '@/components/Header';
 import { SettingItem, SettingItemText } from './styles';
 import Colors from '@/constants/Colors';
 import { useAppDispatch } from '@/hooks';
+import { getAllResources } from '@/store/resources';
 import { getHomePageData } from '@/store/homePageData';
 import { initShopSearch } from '@/store/shopSearch';
 import { clearShopDetails } from '@/store/shopDetails';
@@ -28,6 +29,7 @@ export default function LanguageScreen() {
   }
 
   const onLanguageChange = (lang: string) => {
+    dispatch(getAllResources());
     dispatch(getHomePageData());
     dispatch(initShopSearch());
     dispatch(clearShopDetails());

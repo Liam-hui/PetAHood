@@ -1,24 +1,34 @@
 import * as React from 'react';
-import { Image, ImageSourcePropType, TouchableOpacity } from 'react-native';
+import { TouchableOpacity } from 'react-native';
 import FastImage, { Source } from 'react-native-fast-image';
+import { SvgUri } from 'react-native-svg';
 
 export default function Icon({ icon, size, onPress, style }: { icon: number | Source; size: number, onPress?: () => void, style?: object }) {
+
+  const IconImage = ({ style }: { style?: object }) => {
+    return (
+      typeof icon != 'number' && icon?.uri?.endsWith("svg")
+        ? <SvgUri
+            width={size}
+            height={size}
+            style={{ ...style! }}
+            uri={icon.uri}
+          />
+        : <FastImage 
+            style={{ height: size, width: size, ...style! }}
+            resizeMode="contain"
+            source={icon}
+          />
+    )
+  }
+
   if (onPress != null) return (
     <TouchableOpacity onPress={onPress} style={style!}>
-      <FastImage 
-        style={{ height: size, width: size }}
-        resizeMode="contain"
-        source={icon} 
-      />
+      <IconImage/>
     </TouchableOpacity>
   );
   else return (
-    <FastImage 
-      style={{ height: size, width: size, ...style! }}
-      resizeMode="contain"
-      source={icon} 
-      // defaultSource={}
-    />  
+    <IconImage style={style!}/>
   );
 }
 

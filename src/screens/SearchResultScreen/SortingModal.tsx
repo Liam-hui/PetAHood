@@ -11,14 +11,15 @@ import Icon from '@/components/Icon';
 import { Border, MenuHeading, FilterItem, FilterItemText, MenuItemText } from './styles';
 import WideButton from '@/components/WideButton';
 
-const SortingModal = ({ isVisible, close, sorting, setSorting } : { isVisible: boolean, close: () => void, sorting: SortingType | null, setSorting: Dispatch<SetStateAction<SortingType | null>> })  => {
+const SortingModal = ({ isVisible, close, sorting, setSorting } : { isVisible: boolean, close: () => void, sorting: SortingType | null, setSorting: Dispatch<SetStateAction<SortingType>> })  => {
 
   const SortItem = ({ value }: { value: SortingType }) => {
     return (
       <TouchableOpacity
         style={{ height: 30, alignItems: "center", flexDirection: "row"}}
         onPress={() => {
-          setSorting(sorting == value ? null : value);
+          setSorting(value);
+          close();
         }}
       >
         <MenuItemText style={{}}>{t(`sort_${value}`)}</MenuItemText>

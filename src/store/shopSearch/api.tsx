@@ -98,6 +98,19 @@ export async function getShopSearchResultApi(params?: any, page?: number) {
           }
         },
         params : {
+          // default sort by rating
+          "sorting": params.sorting == "rating"
+              ? "highest_rating"
+              : params.sorting == "new"
+                ? "latest_location"
+                : params.sorting == "az"
+                  ? "az"
+                  : params.sorting == "za"
+                    ? "za"
+                    : params.sorting == "comment"
+                      ? "most_comment"
+                      : "highest_rating",
+
           ...params.searchString && { "search_string": params.searchString },
 
           ...params.ids && { "related_stores": params.ids },
@@ -110,20 +123,6 @@ export async function getShopSearchResultApi(params?: any, page?: number) {
           ...params.regions?.length > 0 && { "regions": getFilterString(params.regions) },
           ...params.pets?.length > 0 && { "pets": getFilterString(params.pets) },
           ...params.cats?.length > 0 && { "cats": getFilterString(params.cats) },
-
-          ...params.sorting && { 
-            "sorting": params.sorting == "rating"
-              ? "highest_rating"
-              : params.sorting == "new"
-                ? "latest_location"
-                : params.sorting == "az"
-                  ? "az"
-                  : params.sorting == "za"
-                    ? "za"
-                    : params.sorting == "comment"
-                      ? "most_comment"
-                      : params.sorting
-          },
 
           ...params.location && { "sorting": "distance" },
 

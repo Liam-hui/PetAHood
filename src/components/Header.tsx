@@ -7,7 +7,7 @@ import Icon from './Icon';
 import Colors from '@/constants/Colors';
 import Styles from '@/constants/Styles';
 
-export default function Header({ title, action, actionWidth, noShadow, isLeft }: { title?: string, action?: React.ReactNode, noShadow?: boolean, isLeft?: boolean, actionWidth?: number }) {
+export default function Header({ title, action, actionWidth, noShadow, isLeft, cantBack }: { title?: string, action?: React.ReactNode, noShadow?: boolean, isLeft?: boolean, actionWidth?: number, cantBack?: boolean }) {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
   const popAction = StackActions.pop(1);
   
@@ -26,19 +26,20 @@ export default function Header({ title, action, actionWidth, noShadow, isLeft }:
         >
           <View 
             style={{ 
-              // flex: 1,
               width: "100%",
               flexDirection: "row", 
               alignItems: "center",
               ... isLeft ? { paddingLeft: 40 } : { justifyContent: "center" },
             }
           }>
-            <Icon
-              icon={require(`../assets/icons/icon-backArrow.png`)}
-              size={24}
-              onPress={() => navigation.dispatch(popAction)}
-              style={{ position: "absolute", left: 0 }}
-            />
+            {!cantBack &&
+              <Icon
+                icon={require(`../assets/icons/icon-backArrow.png`)}
+                size={24}
+                onPress={() => navigation.dispatch(popAction)}
+                style={{ position: "absolute", left: 0 }}
+              />
+            }
 
             {title &&
               <Text style={{ fontWeight: "700", fontSize: 18, color: Colors.orange, ...isLeft && { flex: 1 } }} numberOfLines={1}>{title}</Text>
@@ -47,6 +48,8 @@ export default function Header({ title, action, actionWidth, noShadow, isLeft }:
             {actionWidth && 
               <View style={{ width: actionWidth }} />
             }
+
+            <View style={{ width: 0, height: 18 }}/>
 
             <View style={{ position: "absolute", right: 0, alignItems: "flex-end" }}>
               {action}

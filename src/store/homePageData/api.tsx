@@ -59,3 +59,18 @@ export async function getHomePageBlogsApi() {
     }
   }
 }
+
+export async function getHomePageAdvApi() {
+  try {
+    const { data } = await api.get('/resources/advBanners');
+    return {
+      isSuccess: true,
+      data: data.payload,
+    }
+  } catch (error) {
+    console.log(error);
+    return {
+      isSuccess: false
+    }
+  }
+}

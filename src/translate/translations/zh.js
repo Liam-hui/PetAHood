@@ -2,7 +2,13 @@ export default {
   confirm: "確定",
   cancel: "取消",
   tryAgain: "請重試",
+  submit: "提交",
   reset: "重設",
+  edit: "編輯",
+  to: "至",
+  pleaseLogin: "講先登入",
+  pleaseLoginAgain: "講重新登入",
+  fieldRequired: "此項目必須輸入",
 
   auth_login: "登入",
   auth_email: "電郵地址",
@@ -43,12 +49,14 @@ export default {
   home_search: "搜尋...",
   home_findInspiration: "尋找靈感",
 
+  fav_empty: "你沒有任何收藏",
+
   search_search: "搜尋",
   search_shopName: "商店、好去處名稱",
   search_filter: "地區、竉物分類、需求分類",
   search_recentSearch: "最近搜尋紀錄",
   search_area: "地區",
-  search_petTypes: "竉物分類",
+  search_petTypes: "寵物分類",
   search_needTypes: "需求分類",
   search_specialCats: "特別分類",
   search_searchResult: "搜尋結果",
@@ -110,17 +118,27 @@ export default {
   nearby_description: "好去處、商戶",
   nearby_notGranted: "請允許存取你的位置",
 
+  addLocation_success: "新增地點/商戶成功",
+
   profile_level: "等級",
   profile_fav: "我的收藏",
   profile_reviews: "我的評論",
   profile_footprint: "我的足印",
   profile_voucher: "我的優惠券",
   profile_orders: "我的訂單",
+  profile_noReviews: "你暫時沒有任何評論。",
 
   vouchers_active: "有效",
   vouchers_redeemed: "已兌換",
   vouchers_expired: "已過期",
   vouchers_code: "優惠碼: ",
   vouchers_period: "有效期: ",
-  vouchers_tAndC: "條款及細則"
+  vouchers_tAndC: "條款及細則",
+
+  pet_overview: "Overview",
+  pet_fashionSize: "Fashion Size",
+  pet_weight: "Weight",
+  pet_healthCare: "Health care Record",
+  pet_insurance: "Pet Insurance",
+  pet_grooming: "Grooming Schedule",
 };

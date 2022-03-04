@@ -80,6 +80,7 @@ const LoginTab = ({ goToSignup }: { goToSignup: () => void }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isRemember, setIsRemember] = useState(false);
+  const [isPasswordHidden, setIsPasswordHidden] = useState(true);
   const [isErrorMsgShown, setIsErrorMsgShown] = useState(false);
 
   useEffect(() => {
@@ -92,6 +93,7 @@ const LoginTab = ({ goToSignup }: { goToSignup: () => void }) => {
 
   useEffect(() => {
     if (!isLoading && status == "failed" && errorMsg != null) {
+
       setIsErrorMsgShown(true);
     }
   }, [isLoading, status, errorMsg])
@@ -139,12 +141,20 @@ const LoginTab = ({ goToSignup }: { goToSignup: () => void }) => {
             style={{ marginBottom: 20 }}
           />
           <FieldName>{t("auth_password")}<Text style={{ color: Colors.darkOrange }}>*</Text></FieldName>
-          <TextInput
-            secureTextEntry
-            value={password}
-            onChangeText={setPassword}
-            style={{ marginBottom: 10 }}
-          />
+          <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 10 }}>
+            <TextInput
+              secureTextEntry={isPasswordHidden}
+              value={password}
+              onChangeText={setPassword}
+              style={{ paddingRight: 38 }}
+            />
+            <Icon
+              size={18}
+              icon={require("@/assets/icons/icon-eye.png")}
+              style={{ position: "absolute", right: 10 }}
+              onPress={() => setIsPasswordHidden(!isPasswordHidden)}
+            />
+          </View>
           <View pointerEvents='none' style={{ marginBottom: 20 }}>
             <Text style={{ color: "grey", opacity: isErrorMsgShown ? 1 : 0 }}>{errorMsg?? " "}</Text>
           </View>

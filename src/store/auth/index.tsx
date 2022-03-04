@@ -1,19 +1,17 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState, AppThunk } from '@/store';
-import { loginApi } from './api';
+import { loginApi, refreshTokenApi } from './api';
 import EncryptedStorage from 'react-native-encrypted-storage';
 
 export interface AuthState {
-  status: 'idle' | 'success' | 'failed';
+  status: 'idle' | 'success' | 'failed' | 'needLoginAgain';
   isLoading: boolean;
-  data: { [id: string]: any; };
   errorMsg: string | null;
 }
 
 const initialState: AuthState = {
   status: 'idle',
   isLoading: false,
-  data: {},
   errorMsg: null
 };
 
@@ -36,10 +34,21 @@ export const logout = createAsyncThunk(
   }
 );
 
+export const refreshToken = createAsyncThunk(
+  'refreshToken',
+  async () => {
+    const response = await refreshTokenApi();
+    return { response };
+  }
+);
+
 export const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
+    resetAuth: (state) => {
+      state.status = "idle";
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -65,7 +74,19 @@ export const authSlice = createSlice({
         state.isLoading = false;
         state.status = 'idle';
       })
+      .addCase(refreshToken.pending, (state) => {
+        //
+      })
+      .addCase(refreshToken.fulfilled, (state, action) => {
+        if (action.payload.response.isSuccess) {
+        }
+        else {
+          state.status = 'needLoginAgain';
+        }
+      })
   },
 });
+
+export const { resetAuth } = authSlice.actions;
 
 export default authSlice.reducer;

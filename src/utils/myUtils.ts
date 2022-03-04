@@ -9,6 +9,10 @@ export function entries<T>(obj: T): Entries<T> {
     return Object.entries(obj) as any;
 }
 
+export function objectToValueLabelPair(object: any) {
+    return entries(object).map(([value, label]) => { return { value, label } });
+}
+
 export function updatedFilter(filter_: FilterType, filterStringArray_: string[], filterName: FilterNameType, items: { id: number, name: string }[], isForceAdd?: boolean)  {
     let filter = { ...filter_ };
     let filterStringArray = filterStringArray_.slice();
@@ -25,6 +29,12 @@ export function updatedFilter(filter_: FilterType, filterStringArray_: string[],
             : filterStringArray.concat(name);
     }
     return { filter, filterStringArray };
+}
+
+export function getIdsString(ids: string[]) {
+    return ids.reduce(
+        (prev, curr) => prev + (prev == "" ? "" : ", ") + curr
+    , "")
 }
 
 export function getFilterString(filter: FilterType)  {

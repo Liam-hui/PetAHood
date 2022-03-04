@@ -35,3 +35,29 @@ export async function loginApi(email: string, password: string) {
     }
   }
 }
+
+export async function refreshTokenApi() {
+  try {
+    const { data } = await api.post('/auth/refresh');
+    if (data.code == 0) {
+      await EncryptedStorage.setItem(
+        "token",
+        data.payload.access_token
+      );
+      return {
+        isSuccess: true,
+      }
+    }
+    else {
+      await EncryptedStorage.removeItem("token");
+      return {
+        isSuccess: false,
+      }
+    }
+  } catch (error: any) {
+    await EncryptedStorage.removeItem("token");
+    return {
+      isSuccess: false,
+    }
+  }
+}
