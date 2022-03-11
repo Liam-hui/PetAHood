@@ -8,6 +8,7 @@ interface FormTextInputProps extends TextInputProps, UseControllerProps {
   name: string
   defaultValue?: string,
   style?: object,
+  inputStyle?: object,
 }
 
 export const FormTextInput = (props: FormTextInputProps) => {
@@ -21,6 +22,7 @@ export const FormTextInput = (props: FormTextInputProps) => {
     rules,
     defaultValue,
     style,
+    inputStyle,
     ...inputProps
   } = props;
 
@@ -31,13 +33,15 @@ export const FormTextInput = (props: FormTextInputProps) => {
   return (
     <Container style={{ ...style! }}>
       <LabelText>{label}</LabelText>
-      <InputContainer>
+      <InputContainer style={{ ...inputStyle! }}>
         <TextInput
           autoCapitalize="none"
           textAlign="left"
           onChangeText={field.onChange}
           onBlur={field.onBlur}
           value={field.value}
+          numberOfLines={1}
+          style={{ flex: 1, height: "100%" }}
           {...inputProps}
         />
       </InputContainer>

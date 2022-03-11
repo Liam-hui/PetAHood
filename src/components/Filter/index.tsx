@@ -1,22 +1,20 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
-import { TabView, SceneMap } from 'react-native-tab-view';
+import { TabView } from 'react-native-tab-view';
+import { t } from 'i18next';
+import { ScrollView } from 'react-native-gesture-handler';
+import { useTranslation } from 'react-i18next';
 
 import Layout from '@/constants/Layout';
 import TabBar from '@/components/TabBar';
-
-import { TabContainer, BorderItemWrapper, BorderItemLarge, BorderItemLargeText, BorderItem, BorderItemText } from './styles';
+import { TabContainer, BorderItemWrapper, BorderItem, BorderItemText } from './styles';
 import Colors from '@/constants/Colors';
 import { useAppDispatch, useAppSelector } from '@/hooks';
 import { RootState } from '@/store';
-import { entries } from '@/utils/myUtils';
-import { ScrollView } from 'react-native-gesture-handler';
-import { useTranslation } from 'react-i18next';
-import { t } from 'i18next';
 import { FilterNameType, FilterType } from '@/types';
 import SelectBar from '@/components/SelectBar';
 
-export function FilterTab({ filter, updateFilter }: { filter: FilterType, updateFilter: (filterName: FilterNameType, items: { id: number, name: string }[], isForceAdd?: boolean) => void }) {
+export function Filter({ filter, updateFilter }: { filter: FilterType, updateFilter: (filterName: FilterNameType, items: { id: number, name: string }[], isForceAdd?: boolean) => void }) {
 
   const { t } = useTranslation();
 

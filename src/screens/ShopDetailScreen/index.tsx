@@ -450,7 +450,10 @@ const CustomerUpload = ({ data }: { data: any }) => {
               marginHorizontal: index % 3 == 1 ? 2 : 0
             }}
             onPress={() => {
-              navigation.push("Photos", { data: { shop: [data.cover_image].concat(data.albums), customer: data.comment_photos }, goto: { album: "customer", index } });
+              navigation.push("Photos", { 
+                data: { shop: [data.cover_image].concat(data.albums), customer: data.comment_photos }, 
+                goto: { album: "customer", index: index == 2 && data.comment_photos.length > 6 ? undefined : index } 
+              });
             }}
           >
             <FastImage 
@@ -476,13 +479,13 @@ const Reviews = ({ data }: { data: any }) => {
 
   return (
     <View style={{ paddingHorizontal: Layout.page.paddingHorizontal, paddingTop: 15, backgroundColor: "white", marginBottom: 15 }}>
-      <Heading style={{ marginBottom: 2 }}>{t("shopDetails_reviews")}</Heading>
-      {data.reviews.slice(0, 6).map((review: any) =>
+      <Heading style={{  }}>{t("shopDetails_reviews")}</Heading>
+      {data.reviews.slice(0, 3).map((review: any) =>
         <Review key={review.id} review={review} />
       )}
-      {data.approved_comments_with_show_count > 6 
+      {data.approved_comments_with_show_count > 3
         ? <TouchableOpacity 
-            style={{ alignSelf: "center", marginTop: 10, marginBottom: 15, flexDirection: "row", alignItems: "center" }}
+            style={{ alignSelf: "center", marginVertical: 20, flexDirection: "row", alignItems: "center" }}
             onPress={() => navigation.push('Reviews', { id: data.id, data: data.reviews, count: data.approved_comments_with_show_count })}
           >
             <Text style={{ color: Colors.darkOrange }}>{t("shopDetails_moreReviews")}</Text>

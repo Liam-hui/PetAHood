@@ -9,8 +9,8 @@ import Icon from '@/components/Icon';
 import SearchBar from '@/components/SearchBar';
 import Colors from '@/constants/Colors';
 import WideButton from '@/components/WideButton';
+import { Filter } from '@/components/Filter';
 import { getCommentsPicks, getRatingPicks, getShopQuickSearchResult, getShopSearchResult, resetShopQuickSearch } from '@/store/shopSearch';
-import { FilterTab } from './FilterTab';
 
 import { NearBy, BorderItem, BorderItemText, BorderItemWrapper } from './styles';
 import { hideLoading, showLoading } from '@/store/loading';
@@ -18,7 +18,7 @@ import { useTranslation } from 'react-i18next';
 import HotPicks from './HotPicks';
 import Layout from '@/constants/Layout';
 import { FilterNameType, FilterType } from '@/types';
-import { ShopItemLarge, ShopItemRow } from '@/components/ShopItem';
+import { ShopItemRow } from '@/components/ShopItem';
 import { getFilterString, updatedFilter } from '@/utils/myUtils';
 
 export default function SearchScreen() {
@@ -28,7 +28,6 @@ export default function SearchScreen() {
   const navigation = useNavigation();
   const popAction = StackActions.pop(1);
   const dispatch = useAppDispatch();
-  // const isFocused = useIsFocused();
   const [hasSearch, setHasSearch] = useState(false);
 
   const searchStatus = useAppSelector((state: RootState) => state.shopSearch.status);
@@ -50,9 +49,6 @@ export default function SearchScreen() {
     specialCats: [],
   });
   const [filterStringArray, setFilterStringArray] = useState<string[]>([]);
-  // const filterString = filterStringArray.reduce(
-  //   (previousValue, currentValue) => previousValue + (previousValue == "" ? "" : ", ") + currentValue
-  // , "");
   const filterString = getFilterString(filter);
   const filterCount = Object.values(filter).reduce(
     (prev, current) => {
@@ -180,13 +176,14 @@ export default function SearchScreen() {
         {/* search bars */}
         <View style={{ backgroundColor: "white", paddingHorizontal: 20, paddingBottom: 15, flexDirection: "row", alignItems: "center" }}>
           <TouchableOpacity
-            style={{ flexDirection: "row", alignItems: "center", width: 90, paddingRight: 5 }}
+            style={{ backgroundColor: Colors.orange, flexDirection: "row", alignItems: "center", paddingHorizontal: 10, height: 32, borderRadius: 24, marginRight: 5 }}
             onPress={() => {
               setMode(mode == "filter" ? null: "filter");
             }}
           >
-            <Text numberOfLines={1} style={{ flex: 1 }}>{filterString == "" ? t("search_filter") : filterString}</Text>
-            <Icon icon={require("@/assets/icons/icon-downArrow-orange.png")} size={15} style={{ transform: [{ rotate: mode == "filter" ? "180deg" : "0deg" }] }} />
+            <Text style={{ color: "white", fontWeight: "bold" }}>{t("search_search")}</Text>
+            {/* <Text style={{ color: "white", fontWeight: "bold", flex: 1 }} numberOfLines={1}>{filterString == "" ? t("search_filter") : filterString}</Text> */}
+            <Icon icon={require("@/assets/icons/icon-backArrowWhite.png")} size={15} style={{ marginLeft: 5, transform: [{ rotate: mode == "filter" ? "90deg" : "-90deg" }] }} />
           </TouchableOpacity>
           <View style={{ flex: 1 }}>
             <SearchBar 
@@ -206,20 +203,6 @@ export default function SearchScreen() {
               style={{  }}
             />
           </View>
-          {/* <SearchBar 
-            value={filterString}
-            placeholder={t("search_filter")}
-            isSelected={mode == "filter"}
-            select={() => {
-              setMode("filter");
-            }}
-            unselect={() => {
-              setMode(null);
-              resetFilter();
-            }}
-            style={{ marginBottom: 15 }}
-            isTextDisabled
-          /> */}
         </View>
 
         {(mode == null || (mode == "search" && searchString == "")) &&
@@ -317,7 +300,7 @@ export default function SearchScreen() {
 
         {mode == "filter" &&
           <View style={{ flex: 1, paddingTop: 10, paddingBottom: insets.bottom + 15 }}>
-            <FilterTab filter={filter} updateFilter={updateFilter} />
+            <Filter filter={filter} updateFilter={updateFilter} />
             <WideButton
               text={t('search_search') + (filterCount > 0 ? ` (${filterCount})` : "")}
               onPress={search}

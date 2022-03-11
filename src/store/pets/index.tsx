@@ -1,24 +1,25 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState, AppThunk } from '@/store';
-import { updatePetProfileApi, addPetProfileHealthRecordApi, editPetProfilePetInsurancedApi, getPetProfileApi, getPetProfileFashionSizeApi, getPetProfileHealthRecordApi, getPetProfileOverviewApi, getPetProfilePetInsuranceApi, updatePetProfileGroomingApi, getPetProfileGroomingApi } from './api';
+import { updatePetProfileApi, getPetProfileApi, getPetProfileFashionSizeApi, getPetProfileHealthRecordApi, getPetProfileOverviewApi, getPetProfileInsuranceApi, updatePetProfileGroomingApi, getPetProfileGroomingApi, updatePetProfileInsuranceApi, updatePetProfileHealthRecordApi, updatePetProfileFashionSizeApi } from './api';
 import { Status } from '@/types';
 
 export interface PetsState {
   data: { [id: string]: any; };
-  status: "loading" | "idle";
+  errorMsg: string | undefined;
   // pet profile
   getPetProfileStatus: Status;
   updatePetProfileStatus: Status;
   // overview
   getOverviewStatus: Status;
   // fashionSize
-  fashionSizeLoading: boolean;
+  getFashionSizeStatus: Status;
+  updateFashionSizeStatus: Status;
   // health record
   getHealthRecordStatus: Status;
-  addHealthRecordStatus: Status;
+  updateHealthRecordStatus: Status;
   // pet insurance
-  getPetInsuranceStatus: Status;
-  editPetInsuranceStatus: Status;
+  getInsuranceStatus: Status;
+  updateInsuranceStatus: Status;
   // grooming
   getGroomingStatus: Status;
   updateGroomingStatus: Status;
@@ -26,21 +27,21 @@ export interface PetsState {
 
 const initialState: PetsState = {
   data: {},
-  status: "idle",
-
+  errorMsg: undefined,
   // pet profile
   getPetProfileStatus: "idle",
   updatePetProfileStatus: "idle",
   // overview
   getOverviewStatus: "idle",
   // fashionSize
-  fashionSizeLoading: false,
+  getFashionSizeStatus: "idle",
+  updateFashionSizeStatus: "idle",
   // health record
   getHealthRecordStatus: "idle",
-  addHealthRecordStatus: "idle",
+  updateHealthRecordStatus: "idle",
   // pet insurance
-  getPetInsuranceStatus: "idle",
-  editPetInsuranceStatus: "idle",
+  getInsuranceStatus: "idle",
+  updateInsuranceStatus: "idle",
   // grooming
   getGroomingStatus: "idle",
   updateGroomingStatus: "idle",
@@ -78,6 +79,14 @@ export const getPetProfileFashionSize = createAsyncThunk(
   }
 );
 
+export const updatePetProfileFashionSize = createAsyncThunk(
+  'updatePetProfileFashionSize',
+  async (params: any) => {
+    const response = await updatePetProfileFashionSizeApi(params);
+    return { response };
+  }
+);
+
 export const getPetProfileHealthRecord = createAsyncThunk(
   'getPetProfileHealthRecord',
   async (id: number) => {
@@ -86,26 +95,26 @@ export const getPetProfileHealthRecord = createAsyncThunk(
   }
 );
 
-export const addPetProfileHealthRecord = createAsyncThunk(
-  'addPetProfileHealthRecord',
-  async ({ id, name, date, validUntil }: { id: number, name: string, date: Date, validUntil: Date }) => {
-    const response = await addPetProfileHealthRecordApi(id, name, date, validUntil);
+export const updatePetProfileHealthRecord = createAsyncThunk(
+  'updatePetProfileHealthRecord',
+  async (params: any) => {
+    const response = await updatePetProfileHealthRecordApi(params);
     return { response };
   }
 );
 
-export const getPetProfilePetInsurance = createAsyncThunk(
-  'getPetProfilePetInsurance',
+export const getPetProfileInsurance = createAsyncThunk(
+  'getPetProfileInsurance',
   async (id: number) => {
-    const response = await getPetProfilePetInsuranceApi(id);
+    const response = await getPetProfileInsuranceApi(id);
     return { id, response };
   }
 );
 
-export const editPetProfilePetInsurance = createAsyncThunk(
-  'editPetProfilePetInsurance',
-  async ({ id, insuranceId, name, startDate, endDate }: { id: number, insuranceId?: number, name: string, startDate: Date, endDate: Date }) => {
-    const response = await editPetProfilePetInsurancedApi(id, name, startDate, endDate, insuranceId!);
+export const updatePetProfileInsurance = createAsyncThunk(
+  'updatePetProfileInsurance',
+  async (params: any) => {
+    const response = await updatePetProfileInsuranceApi(params);
     return { response };
   }
 );
@@ -130,8 +139,41 @@ export const petsSlice = createSlice({
   name: 'pets',
   initialState,
   reducers: {
+    clearPetProfileData: (state) => {
+      state.data = {};
+    },
     resetPetProfileStatus: (state) => {
-      state.addHealthRecordStatus == "idle";
+      state.errorMsg = undefined;
+      // pet profile
+      state.getPetProfileStatus = "idle";
+      state.updatePetProfileStatus = "idle";
+      // overview
+      state.getOverviewStatus = "idle";
+      // fashionSize
+      state.getFashionSizeStatus = "idle";
+      state.updateFashionSizeStatus = "idle";
+      // health record
+      state.getHealthRecordStatus = "idle";
+      state.updateHealthRecordStatus = "idle";
+      // pet insurance
+      state.getInsuranceStatus = "idle";
+      state.updateInsuranceStatus = "idle";
+      // grooming
+      state.getGroomingStatus = "idle";
+      state.updateGroomingStatus = "idle";
+    },
+    resetPetProfileUpdateStatus: (state) => {
+      state.errorMsg = undefined;
+      // pet profile
+      state.updatePetProfileStatus = "idle";
+      // fashionSize
+      state.updateFashionSizeStatus = "idle";
+      // health record
+      state.updateHealthRecordStatus = "idle";
+      // pet insurance
+      state.updateInsuranceStatus = "idle";
+      // grooming
+      state.updateGroomingStatus = "idle";
     },
   },
   extraReducers: (builder) => {
@@ -153,6 +195,9 @@ export const petsSlice = createSlice({
       })
       .addCase(updatePetProfile.fulfilled, (state, action) => {
         state.updatePetProfileStatus = action.payload.response.isSuccess ? "success" : "failed";
+        if (!action.payload.response.isSuccess) {
+          state.errorMsg = action.payload.response.errorMsg;
+        }
       })
       // overview
       .addCase(getPetProfileOverview.pending, (state) => {
@@ -163,17 +208,28 @@ export const petsSlice = createSlice({
         if (action.payload.response.isSuccess) {
           if (!state.data[action.payload.id])
             state.data[action.payload.id] = {};
-          state.data[action.payload.id].overflow = action.payload.response.data;
+          state.data[action.payload.id].overview = action.payload.response.data;
         }
       })
       // fahsion size
       .addCase(getPetProfileFashionSize.pending, (state) => {
-        state.fashionSizeLoading = true;
+        state.getFashionSizeStatus = "loading";
       })
       .addCase(getPetProfileFashionSize.fulfilled, (state, action) => {
-        state.fashionSizeLoading = false;
+        state.getFashionSizeStatus = action.payload.response.isSuccess ? "success" : "failed";
         if (action.payload.response.isSuccess) {
+          if (!state.data[action.payload.id])
+            state.data[action.payload.id] = {};
           state.data[action.payload.id].fashionSize = action.payload.response.data;
+        }
+      })
+      .addCase(updatePetProfileFashionSize.pending, (state) => {
+        state.updateFashionSizeStatus = "loading";
+      })
+      .addCase(updatePetProfileFashionSize.fulfilled, (state, action) => {
+        state.updateFashionSizeStatus = action.payload.response.isSuccess ? "success" : "failed";
+        if (!action.payload.response.isSuccess) {
+          state.errorMsg = action.payload.response.errorMsg;
         }
       })
       // health record
@@ -183,30 +239,40 @@ export const petsSlice = createSlice({
       .addCase(getPetProfileHealthRecord.fulfilled, (state, action) => {
         state.getHealthRecordStatus = action.payload.response.isSuccess ? "success" : "failed";
         if (action.payload.response.isSuccess) {
+          if (!state.data[action.payload.id])
+            state.data[action.payload.id] = {};
           state.data[action.payload.id].healthRecord = action.payload.response.data;
         }
       })
-      .addCase(addPetProfileHealthRecord.pending, (state) => {
-        state.addHealthRecordStatus = "loading";
+      .addCase(updatePetProfileHealthRecord.pending, (state) => {
+        state.updateHealthRecordStatus = "loading";
       })
-      .addCase(addPetProfileHealthRecord.fulfilled, (state, action) => {
-        state.addHealthRecordStatus = action.payload.response.isSuccess ? "success" : "failed";
+      .addCase(updatePetProfileHealthRecord.fulfilled, (state, action) => {
+        state.updateHealthRecordStatus = action.payload.response.isSuccess ? "success" : "failed";
+        if (!action.payload.response.isSuccess) {
+          state.errorMsg = action.payload.response.errorMsg;
+        }
       })
       // pet insurance
-      .addCase(getPetProfilePetInsurance.pending, (state) => {
-        state.getPetInsuranceStatus = "loading";
+      .addCase(getPetProfileInsurance.pending, (state) => {
+        state.getInsuranceStatus = "loading";
       })
-      .addCase(getPetProfilePetInsurance.fulfilled, (state, action) => {
-        state.getPetInsuranceStatus = action.payload.response.isSuccess ? "success" : "failed";
+      .addCase(getPetProfileInsurance.fulfilled, (state, action) => {
+        state.getInsuranceStatus = action.payload.response.isSuccess ? "success" : "failed";
         if (action.payload.response.isSuccess) {
+          if (!state.data[action.payload.id])
+            state.data[action.payload.id] = {};
           state.data[action.payload.id].petInsurance = action.payload.response.data;
         }
       })
-      .addCase(editPetProfilePetInsurance.pending, (state) => {
-        state.editPetInsuranceStatus = "loading";
+      .addCase(updatePetProfileInsurance.pending, (state) => {
+        state.updateInsuranceStatus = "loading";
       })
-      .addCase(editPetProfilePetInsurance.fulfilled, (state, action) => {
-        state.editPetInsuranceStatus = action.payload.response.isSuccess ? "success" : "failed";
+      .addCase(updatePetProfileInsurance.fulfilled, (state, action) => {
+        state.updateInsuranceStatus = action.payload.response.isSuccess ? "success" : "failed";
+        if (!action.payload.response.isSuccess) {
+          state.errorMsg = action.payload.response.errorMsg;
+        }
       })
       // grooming
       .addCase(getPetProfileGrooming.pending, (state) => {
@@ -215,6 +281,8 @@ export const petsSlice = createSlice({
       .addCase(getPetProfileGrooming.fulfilled, (state, action) => {
         state.getGroomingStatus = action.payload.response.isSuccess ? "success" : "failed";
         if (action.payload.response.isSuccess) {
+          if (!state.data[action.payload.id])
+            state.data[action.payload.id] = {};
           state.data[action.payload.id].grooming = action.payload.response.data;
         }
       })
@@ -223,19 +291,32 @@ export const petsSlice = createSlice({
       })
       .addCase(updatePetProfileGrooming.fulfilled, (state, action) => {
         state.updateGroomingStatus = action.payload.response.isSuccess ? "success" : "failed";
+        if (!action.payload.response.isSuccess) {
+          state.errorMsg = action.payload.response.errorMsg;
+        }
       })
   },
 });
 
+export const { clearPetProfileData } = petsSlice.actions;
+
+export const clearPetProfile = (): AppThunk => (
+  dispatch,
+) => {
+  dispatch(clearPetProfileData());
+  dispatch(resetPetProfileStatus());
+  dispatch(resetPetProfileUpdateStatus());
+};
+
 export const getPetProfileAll = (id: number): AppThunk => (
   dispatch,
-  // getState
 ) => {
   dispatch(getPetProfile(id));
   dispatch(getPetProfileOverview(id));
+  dispatch(getPetProfileFashionSize(id));
 };
 
-export const { resetPetProfileStatus } = petsSlice.actions;
+export const { resetPetProfileStatus, resetPetProfileUpdateStatus } = petsSlice.actions;
 
 export default petsSlice.reducer;
 

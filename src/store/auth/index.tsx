@@ -74,6 +74,10 @@ export const authSlice = createSlice({
         state.isLoading = false;
         state.status = 'idle';
       })
+      .addCase(logout.rejected, (state) => {
+        state.isLoading = false;
+        state.status = 'idle';
+      })
       .addCase(refreshToken.pending, (state) => {
         //
       })

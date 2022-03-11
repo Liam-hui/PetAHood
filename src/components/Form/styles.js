@@ -8,7 +8,6 @@ export const LabelText = styled.Text`
 `;
 
 export const ValueText = styled.Text`
-
 `;
 
 export const ErrorText = styled.Text`
@@ -25,8 +24,10 @@ export const InputContainer = styled.View`
   backgroundColor: white;
   borderColor: ${Colors.orange};
   borderWidth: 1px;
-  paddingVertical: 10px;
+  height: 36px;
   paddingHorizontal: 5px;
   borderRadius: 4px;
+  flex-direction: row;
+  align-items: center;
 `;
 

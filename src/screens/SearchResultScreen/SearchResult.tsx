@@ -110,6 +110,7 @@ export default function SearchResult({ hideSearchBar }: { hideSearchBar?: boolea
   );
 
   const onEndReached = () => {
+    console.log("reached", searchStatus, nextPage);
     if (searchStatus != "loading" && nextPage != null) {
       dispatch(getShopSearchResultNextPage());
     }
@@ -202,6 +203,15 @@ export default function SearchResult({ hideSearchBar }: { hideSearchBar?: boolea
           }}
           onEndReached={onEndReached}
           onEndReachedThreshold={0.9}
+          ListFooterComponent={
+            <>
+            {searchStatus == "loading" &&
+              <View style={{ width: "100%", alignItems: "center", justifyContent: "center"}}>
+                <ActivityIndicator color="grey" />
+              </View>
+            }
+            </>
+          }
         />
       }
 

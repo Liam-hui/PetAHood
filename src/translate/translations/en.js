@@ -2,6 +2,7 @@ export default {
   confirm: "Confirm",
   cancel: "Cancel",
   tryAgain: "Try Again",
+  save: "Save",
   submit: "Submit",
   reset: "Reset",
   edit: "Edit",
@@ -9,6 +10,8 @@ export default {
   pleaseLogin: "Please login first",
   pleaseLoginAgain: "Please login again",
   fieldRequired: "Please fill out this field",
+  takePhoto: "Take Photo",
+  uploadImage: "Upload Image",
 
   auth_login: "Login",
   auth_email: "Email Address",
@@ -126,7 +129,14 @@ export default {
   profile_footprint: "Footprint",
   profile_voucher: "Voucher",
   profile_orders: "Orders",
-  profile_noReviews: "You don't have any reviews at the moment",
+  profile_noReviews: "You don't have any review at the moment",
+  profile_noVoucher: "No vouchers",
+
+  footprint_place: "Places-to-go",
+  footprint_shop: "Shops",
+  footprint_service: "Services",
+  footprint_currentMonth: "Current Month",
+  footprint_lifeTime: "Lifetime",
 
   vouchers_active: "Active",
   vouchers_redeemed: "Redeemed",
@@ -135,16 +145,23 @@ export default {
   vouchers_period: "Valid Period: ",
   vouchers_tAndC: "Terms & Conditions",
 
+  orders_heading: "Past Orders",
+  orders_order: "Order #: ",
+  orders_amount: "Status: ",
+  orders_amount: "Amount: ",
+  orders_noOrder: "You don't have any order at the moment",
+
   pet_name: "Name",
   pet_petType: "Type of Pet",
   pet_breed: "Breed",
-  pet_bd: "Pet's Birthday",
+  pet_bd: "Day of birth",
   pet_gender: "Gender",
   pet_sterilizeStatus: "Sterilization Status",
   pet_sterilized: "Sterilized",
   pet_notSterilized: "Not Sterilized",
   pet_unsure: "Unsure",
   pet_chipNumber: "ChipNumber",
+  pet_photo: "Photo",
 
   pet_overview: "Overview",
   pet_fashionSize: "Fashion Size",
@@ -153,6 +170,9 @@ export default {
   pet_insurance: "Pet Insurance",
   pet_grooming: "Grooming Schedule",
 
+  overflow_appointment: "Appointments",
+  overflow_schedule: "Grooming Schedule",
+
   fashionSize_size: "Size",
   fashionSize_body: "Body",
   fashionSize_chest: "Chest",
@@ -160,11 +180,14 @@ export default {
   fashionSize_lastUpdate: "Last updated on ",
   fashionSize_addNewSet: "Add new set",
 
+  healthRecord_batchNumber: "Batch number",
+  healthRecord_digitalRecord: "Digital Vaccine Record",
   healthRecord_addRecord: "Add new record",
+  healthRecord_deleteRecord: "Delete record",
   healthRecord_sterilisationStatus: "Sterilisation Status",
   healthRecord_vaccineRecord: "Vaccine Record",
   healthRecord_vaccineDate: "Date of Vaccination",
-  healthRecord_vaccineName: "Vaccine Name",
+  healthRecord_vaccineName: "Name of Vaccine",
   healthRecord_validUntil: "Valid until",
 
   petInsurance_insurer: "Pet Insurer",
@@ -174,6 +197,7 @@ export default {
   petInsurance_startDate: "Start Date",
   petInsurance_endDate: "End Date",
   petInsurance_insurance: "Insurance",
+  petInsurance_remindMe: "Remind you 30 days before expiry date",
 
   grooming_date: "Date and Time",
   grooming_company: "Company Name",
@@ -182,4 +206,5 @@ export default {
   grooming_remarks: "Remarks",
   grooming_priceType: "Price Type",
   grooming_price: "Price",
+  grooming_add: "Add new schedule",
 };

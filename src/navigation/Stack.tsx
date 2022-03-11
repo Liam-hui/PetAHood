@@ -18,6 +18,8 @@ import ProfileScreen from '../screens/Profile/ProfileScreen';
 // Pet
 import PetScreen from '../screens/Pet/PetScreen';
 import AddPetScreen from '../screens/Pet/AddPetScreen';
+import PetHealthRecordFormScreen from '@/screens/Pet/PetHealthRecordFormScreen';
+import PetInsuranceFormScreen from '@/screens/Pet/PetInsuranceFormScreen';
 import PetGroomingFormScreen from '../screens/Pet/PetGroomingFormScreen';
 
 // auth
@@ -98,6 +100,8 @@ const StackNavigator = () => {
         {authStatus == "success" && 
           <>
             <Stack.Screen name="AddPet" component={AddPetScreen} />
+            <Stack.Screen name="PetHealthRecordForm" component={PetHealthRecordFormScreen} />
+            <Stack.Screen name="PetInsuranceForm" component={PetInsuranceFormScreen} />
             <Stack.Screen name="PetGroomingForm" component={PetGroomingFormScreen} />
           </>
         }

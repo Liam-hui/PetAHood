@@ -9,18 +9,19 @@ import Icon from '@/components/Icon';
 import { Row, NameText, LinkText, LabelText, NumberText, CircleImage, Border } from './styles';
 import { useAppDispatch, useAppSelector } from '@/hooks';
 import { logout } from '@/store/auth';
-import { RootState } from '@/store';
+import { RootState, store } from '@/store';
 import FastImage from 'react-native-fast-image';
 import Styles from '@/constants/Styles';
 import { useTranslation } from 'react-i18next';
 import TabBar from '@/components/TabBar';
-import { getUserProfileAll } from '@/store/profile';
+import { getUserProfileAll, getUserProfileFootprint, getUserProfileOrders, getUserProfileReviews, resetUserProfileStatus } from '@/store/profile';
 import Favourites from './Favourites';
 import Layout from '@/constants/Layout';
 import Reviews from './Reviews';
 import Vouchers from './Vouchers';
 import Footprint from './Footprint';
 import Colors from '@/constants/Colors';
+import Orders from './Orders';
 
 export default function ProfileScreen() {
 
@@ -28,6 +29,10 @@ export default function ProfileScreen() {
 
   useEffect(() => {
     dispatch(getUserProfileAll());
+    
+    return () => {
+      dispatch(resetUserProfileStatus());
+    }
   }, [])
 
   return (
@@ -185,6 +190,7 @@ const Header = () => {
 const ProfileTabView = () => {
 
   const { t } = useTranslation();
+  const dispatch = useAppDispatch();
 
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([
@@ -200,8 +206,29 @@ const ProfileTabView = () => {
     reviews: () =>  <Reviews />,
     footprint: () => <Footprint />,
     voucher: () => <Vouchers />,
-    orders: () => <View style={{ flex: 1}} />,
+    orders: () => <Orders />,
   });
+
+  useEffect(() => {
+    if (index == 0) {
+
+    }
+    else if (index == 1) {
+      if (store.getState().profile.reviewsStatus == 'idle')
+        dispatch(getUserProfileReviews({ isInit: true }));
+    }
+    else if (index == 2) {
+      if (store.getState().profile.footprintStatus == 'idle')
+        dispatch(getUserProfileFootprint());
+    }
+    else if (index == 3) {
+
+    }
+    else if (index == 4) {
+      if (store.getState().profile.ordersStatus == 'idle')
+        dispatch(getUserProfileOrders({ isInit: true }));
+    }
+  }, [index])
 
   return (
     <TabView

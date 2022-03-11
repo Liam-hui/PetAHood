@@ -5,9 +5,13 @@ import FastImage from 'react-native-fast-image'
 
 import { RootStackScreenProps } from '@/types';
 import Layout from '@/constants/Layout';
+import Icon from '@/components/Icon';
+import { StackActions } from '@react-navigation/native';
 
 export default function AlbumModalScreen(props: RootStackScreenProps<'AlbumModal'>) {
 
+  const { navigation } = props;
+  const popAction = StackActions.pop(1);
   const { images, index } = props.route.params;
   const [activeIndex, setActiveIndex] = useState(index ?? 0);
   const carouselRef = useRef<Carousel<any> | null>(null);
@@ -92,6 +96,12 @@ export default function AlbumModalScreen(props: RootStackScreenProps<'AlbumModal
           )}
         </ScrollView>
       </View>
+      <Icon
+        style={{ position: "absolute", right: 25, top: 25 }}
+        size={18}
+        icon={require("@/assets/icons/icon-closeWhite.png")}
+        onPress={() => navigation.dispatch(popAction)}
+      />
     </SafeAreaView>
   );
 }

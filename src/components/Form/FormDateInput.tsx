@@ -6,6 +6,7 @@ import { useController, useFormContext, UseControllerProps } from 'react-hook-fo
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 import { Container, ErrorText, InputContainer, LabelText, ValueText } from './styles';
+import Icon from '../Icon';
 
 interface FormDateInputProps extends UseControllerProps {
   label: string
@@ -13,6 +14,7 @@ interface FormDateInputProps extends UseControllerProps {
   defaultValue?: string,
   mode?: "date" | "time" | "datetime",
   style?: object,
+  labelStyle?: object,
 }
 
 export const FormDateInput = (props: FormDateInputProps) => {
@@ -29,6 +31,7 @@ export const FormDateInput = (props: FormDateInputProps) => {
     defaultValue,
     mode,
     style,
+    labelStyle
   } = props;
 
   const { field } = useController({ name, rules, defaultValue });
@@ -38,11 +41,16 @@ export const FormDateInput = (props: FormDateInputProps) => {
 
   return (
     <Container style={{ ...style! }}>
-      <LabelText>{label}</LabelText>
+      <LabelText style={{ ...labelStyle! }}>{label}</LabelText>
       <InputContainer as={TouchableOpacity}
         onPress={() => setIsPickerVisible(true)}
       >
         <ValueText>{field.value ? (mode == "datetime" ? moment(field.value).format('DD/MM/YYYY h:mm A') : moment(field.value).format('DD/MM/YYYY') ): ""}</ValueText>
+        <Icon
+          size={16}
+          icon={require("@/assets/icons/icon-calendar.png")}
+          style={{ marginLeft: "auto"}}
+        />
       </InputContainer>
       <DateTimePickerModal
         isVisible={isPickerVisible}

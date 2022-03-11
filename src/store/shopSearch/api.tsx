@@ -130,7 +130,7 @@ export async function getShopSearchResultApi(params?: any, page?: number) {
         }
       }
     );
-    console.log(data.payload);
+    // console.log(data.payload);
     return {
       isSuccess: true,
       result: data.payload.data,

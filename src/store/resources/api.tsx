@@ -11,6 +11,7 @@ export async function getPetResourcesApi() {
       api.get('/resources/petGroomingPriceType'),
       api.get('/resources/petWeight'),
     ]);
+    console.log(responses);
     responses = responses.map(x => x.data.payload);
     const data: any = {
       petTypes: responses[0],

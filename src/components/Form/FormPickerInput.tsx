@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { TouchableOpacity } from 'react-native';
-import { useTranslation } from 'react-i18next';
 import { useController, useFormContext, UseControllerProps } from 'react-hook-form';
 
 import { Container, ErrorText, InputContainer, LabelText, ValueText } from './styles';
 import BottomPicker from '../BottomPicker';
+import Icon from '../Icon';
 
 interface FormPickerInputProps extends UseControllerProps {
   label: string
@@ -40,7 +40,11 @@ export const FormPickerInput = (props: FormPickerInputProps) => {
         onPress={() => setIsPickerVisible(true)}
       >
         <ValueText>{items.find(x => x.value == field.value)?.label ?? ""}</ValueText>
-        {/* <ValueText>{field.value}</ValueText> */}
+        <Icon
+          size={16}
+          icon={require("@/assets/icons/icon-downArrow-orange.png")}
+          style={{ marginLeft: "auto"}}
+        />
       </InputContainer>
       <BottomPicker
         isVisible={isPickerVisible}

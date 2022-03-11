@@ -7,7 +7,7 @@ export default function Banners({ data }: { data: any[] }) {
 
   const renderItem = ({ item } : { item: any }) => {
     return (
-      <FastImage style={{ width: Layout.window.width, height: Layout.window.width * 160 / 375 }} source={{ uri: item.image }} />
+      <FastImage style={{ width: Layout.window.width, height: Layout.window.width * 0.32 }} source={{ uri: item.image }} />
     ) 
   }
 

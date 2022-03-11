@@ -13,6 +13,7 @@ import FastImage from 'react-native-fast-image';
 import Styles from '@/constants/Styles';
 import Colors from '@/constants/Colors';
 import Icon from '@/components/Icon';
+import FlatListWithLoader from '@/components/FlatListWithLoader';
 
 export default function Vouchers() {
 
@@ -28,7 +29,7 @@ export default function Vouchers() {
   ]
 
   const data = useAppSelector((state: RootState) => state.profile.vouchers[selected]);
-  const isLoading = useAppSelector((state: RootState) => state.profile.vouchersLoading);
+  const status = useAppSelector((state: RootState) => state.profile.vouchersStatus);
   const nextPage = useAppSelector((state: RootState) => state.profile.vouchersNextPage[selected]);
 
   useEffect(() => {
@@ -43,7 +44,7 @@ export default function Vouchers() {
   );
 
   const onEndReached = () => {
-    if (!isLoading && nextPage != null) {
+    if (status != "loading" && nextPage != null) {
       dispatch(getUserProfileVouchers({
         type: selected
       }));
@@ -57,8 +58,10 @@ export default function Vouchers() {
         value={selected}
         select={(value: any) => setSelected(value)}
       />
-      <FlatList
+      <FlatListWithLoader
         data={data}
+        status={status}
+        reload={() => dispatch(getUserProfileVouchers({ isInit: true, type: selected }))}
         renderItem={renderItem}
         keyExtractor={item => item.id}
         showsHorizontalScrollIndicator={false}
@@ -70,9 +73,9 @@ export default function Vouchers() {
         }}
         onEndReached={onEndReached}
         onEndReachedThreshold={0.9}
-        ListFooterComponent={
+        ListEmptyComponent={
           <>
-            {isLoading && <ActivityIndicator color="grey" style={{ marginVertical: 10 }}/> }
+            {status != "loading" && <Text style={{ textAlign: "center", marginTop: 10 }}>{t("profile_noVoucher")}</Text>}
           </>
         }
       />
@@ -85,10 +88,11 @@ const Voucher = ({ voucher }: { voucher: any }) => {
   const { t } = useTranslation();
 
   return (
-    <View style={{ flexDirection: "row", height: 200, width: "100%", backgroundColor: "white", borderRadius: 10, overflow: "hidden", marginBottom: 20, ...Styles.shadowStyle }}>
+    <View style={{ flexDirection: "row", alignItems: "center", minHeight: 200, width: "100%", backgroundColor: "white", borderRadius: 10, overflow: "hidden", marginBottom: 20, ...Styles.shadowStyle }}>
       <FastImage
-        style={{ width: "35%", height: "100%" }}
+        style={{ width: 100, height: 100, marginLeft: 10, borderRadius: 8 }}
         source={{ uri: voucher.image }}
+        resizeMode="contain"
       />
       <View style={{ flex: 1, paddingVertical: 20, paddingHorizontal: 15 }}>
         <Text style={{ fontWeight: "bold", marginBottom: 12, fontSize: 13 }}>{voucher.campaign_name}</Text>
@@ -107,12 +111,14 @@ const Voucher = ({ voucher }: { voucher: any }) => {
         </View>
         <Text style={{ fontSize: 12 }}>{t("vouchers_period") + voucher.date_range}</Text>
         {voucher.hvTC && 
-          <TouchableOpacity style={{ marginTop: 10, flexDirection: "row", alignItems: "center" }}>
-            <Text style={{ color: Colors.orange, marginRight: 10, fontSize: 13 }}>{t("vouchers_tAndC")}</Text>
-            <Icon
-              size={16}
-              icon={require("@/assets/icons/icon-arrowRightOrange.png")}
-            />
+          <TouchableOpacity style={{ marginTop: "auto" }}>
+            <View style={{ marginTop: 20, flexDirection: "row", alignItems: "center" }}>
+              <Text style={{ color: Colors.orange, marginRight: 10, fontSize: 13 }}>{t("vouchers_tAndC")}</Text>
+              <Icon
+                size={16}
+                icon={require("@/assets/icons/icon-arrowRightOrange.png")}
+              />
+            </View>
           </TouchableOpacity>
         }
       </View>

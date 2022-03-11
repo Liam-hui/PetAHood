@@ -24,7 +24,11 @@ export default function HotPicks({ data }: { data: any[] }) {
       <View style={{ paddingHorizontal: 15, paddingVertical: 10 }}>
         {data.map((item, index) => {
           return (
-            <View key={item.id} style={{ flexDirection: "row", marginVertical: 8 }}>
+            <TouchableOpacity  
+              key={item.id} 
+              style={{ flexDirection: "row", marginVertical: 8 }}
+              onPress={() => navigation.push("ShopDetail", { id: item.id })}
+            >
               <View>
                 <FastImage 
                   style={{ width: 84, height: 62, marginRight: 4, borderRadius: 13 }}
@@ -49,12 +53,7 @@ export default function HotPicks({ data }: { data: any[] }) {
               </View>
               <View style={{ flex: 1, paddingLeft: 15 }}>
                 {/* title */}
-                <TouchableOpacity 
-                  style={{ }}
-                  onPress={() => navigation.push("ShopDetail", { id: item.id })}
-                >
-                  <Text numberOfLines={1} style={{ color: index < 3 ? Colors.orange : "black", fontWeight: "bold" }}>{item.name}</Text>
-                </TouchableOpacity>
+                <Text numberOfLines={1} style={{ color: index < 3 ? Colors.orange : "black", fontWeight: "bold" }}>{item.name}</Text>
                 {/* type */}
                 {item.need_types && item.need_types.length > 0 &&
                   <Text style={{ color: "#B2B2B2", fontWeight: "bold", marginTop: 5, fontSize: 13 }}>{item.need_types[0].name}</Text>
@@ -69,9 +68,7 @@ export default function HotPicks({ data }: { data: any[] }) {
                   <Text style={{ fontSize: 13 }}>({item.approved_comments_with_show_count})</Text>
                 </View>
               </View>
-             
-           
-            </View>
+            </TouchableOpacity >
           )
         })}
       </View>

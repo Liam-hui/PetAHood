@@ -53,8 +53,8 @@ export default function ReviewsScreen(props: RootStackScreenProps<'Reviews'>) {
   }
 
   const renderItem = ({ item }: { item: any }) => (
-    <View style={{ backgroundColor: "white", paddingHorizontal: Layout.page.paddingHorizontal, }}>
-      <Review key={item.id} review={item} />
+    <View style={{ paddingHorizontal: Layout.page.paddingHorizontal, }}>
+      <Review key={item.id} review={item} isFull />
     </View>
   );
 

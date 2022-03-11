@@ -101,6 +101,22 @@ export async function getUserProfileReviewsApi(page?: number) {
   }
 }
 
+export async function getUserProfileFootprintApi() {
+  try {
+    const { data } = await api.get('/user/profile/footprint');
+    console.log(data.payload);
+    return {
+      isSuccess: true,
+      data: data.payload,
+    }
+  } catch (error) {
+    console.log(error);
+    return {
+      isSuccess: false
+    }
+  }
+}
+
 export async function getUserProfileVouchersApi(type: string, page?: number) {
   try {
     const { data } = await api.get('/user/profile/vouchers/' + type, 
@@ -124,13 +140,20 @@ export async function getUserProfileVouchersApi(type: string, page?: number) {
   }
 }
 
-export async function getUserProfileFootprintApi() {
+export async function getUserProfileOrdersApi(page?: number) {
   try {
-    const { data } = await api.get('/user/profile/footprint');
+    const { data } = await api.get('/user/profile/orders/', 
+      { 
+        params : {
+          ...page && { page }
+        }
+      }
+    );
     console.log(data.payload);
     return {
       isSuccess: true,
-      data: data.payload,
+      data: data.payload.data,
+      nextPage: data.payload.current_page < data.payload.last_page ? (data.payload.current_page + 1) : null
     }
   } catch (error) {
     console.log(error);

@@ -1,16 +1,22 @@
 
 
 import React from 'react';
-import Layout from '@/constants/Layout';
-import { Image, ImageSourcePropType } from 'react-native';
-
-import { ButtonsContainer, ButtonLabel, ButtonContainer } from './styles';
 import FastImage from 'react-native-fast-image';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
+import Layout from '@/constants/Layout';
+import { ButtonsContainer, ButtonLabel, ButtonContainer } from './styles';
+
+const PADDING = 25;
+const MARGIN = 14;
 
 export default function Buttons({ data }: { data: any[] }) {
 
+  const navigation = useNavigation<NativeStackNavigationProp<any>>();
+
   return (
-    <ButtonsContainer style={{ paddingLeft: Layout.page.paddingHorizontal }}>
+    <ButtonsContainer style={{ paddingLeft: PADDING }}>
       {data.map(row => {
         return (
           row.btns.map((item: any, index: number) =>
@@ -18,7 +24,10 @@ export default function Buttons({ data }: { data: any[] }) {
               key={index}
               label={item.name}
               icon={item.icon} 
-              onPress={() => {}}
+              onPress={() => {
+                if (item.target)
+                  navigation.push("WebView", { url: item.target });
+              }}
             />
           )
         )
@@ -28,11 +37,10 @@ export default function Buttons({ data }: { data: any[] }) {
 }
 
 const ButtonItem = ({ label, icon, onPress }: { label: string, icon: string, onPress: () => void }) => {
-  const margin = 10;
   return (
-    <ButtonContainer style={{ width: (Layout.window.width - Layout.page.paddingHorizontal * 2 - margin * 3 ) / 4, marginRight: margin }} onPress={onPress} activeOpacity={0.6} >
+    <ButtonContainer style={{ width: (Layout.window.width - PADDING * 2 - MARGIN * 3 ) / 4, marginRight: MARGIN }} onPress={onPress} activeOpacity={0.6} >
       <FastImage 
-        style={{ height: 34, width: 34, marginBottom: 5 }}
+        style={{ height: 30, width: 30, marginBottom: 5 }}
         resizeMode="contain"
         source={{ uri: icon }} 
       />

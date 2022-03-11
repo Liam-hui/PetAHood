@@ -59,12 +59,15 @@ const DrawerContent = (props: DrawerContentComponentProps) => {
           <DrawerItem
             icon={require(`../assets/icons/icon-drawerItem-membership.png`)}
             label={t("drawerItem_membership")}
-            onPress={() => {}}
+            onPress={() => {
+              navigation.navigate("WebView", { url: `${HOST}${lang}/page/membership-offer`, heading: t("drawerItem_membership") });
+            }}
           />
           <DrawerItem
             icon={require(`../assets/icons/icon-voucher.png`)}
             label={t("drawerItem_vouchers")}
-            onPress={() => {}}
+            onPress={() => {
+            }}
           />
           <View style={styles.border} />
           <DrawerItem

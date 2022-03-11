@@ -27,7 +27,7 @@ export default function PhotosScreen(props: RootStackScreenProps<'Photos'>) {
 
 
   useEffect(() => {
-    if (goto) {
+    if (goto?.index != undefined) {
       navigation.push("AlbumModal", { images: goto.album == "customer" ? data.customer : data.shop, index: goto.index });
     }
   }, [])

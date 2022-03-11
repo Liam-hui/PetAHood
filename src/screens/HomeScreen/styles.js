@@ -19,8 +19,8 @@ export const ButtonsContainer = styled.View`
 
 export const ButtonContainer = styled.TouchableOpacity`
   background-color: white;
-  width: 74px;
-  height: 96px;
+  width: 70px;
+  height: 85px;
   box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.08);
   border-radius: 25px;  
   margin-vertical: 5px;

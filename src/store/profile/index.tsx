@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState, AppThunk } from '@/store';
-import { getUserProfileApi, getUserProfileFavApi, getUserProfileFootprintApi, getUserProfileReviewsApi, getUserProfileVouchersApi } from './api';
+import { getUserProfileApi, getUserProfileFavApi, getUserProfileFootprintApi, getUserProfileOrdersApi, getUserProfileReviewsApi, getUserProfileVouchersApi } from './api';
+import { Status } from '@/types';
 
 export interface ProfileState {
   data: any | null;
@@ -10,14 +11,19 @@ export interface ProfileState {
   favNextPage: number | null;
   // reviews
   reviews: any[];
-  reviewsLoading: boolean;
+  reviewsStatus: Status;
   reviewsNextPage: number | null;
   // footprint
   footprint: any;
+  footprintStatus: Status;
   // vouchers
   vouchers: { "active": any[], "redeemed": any[], "expired": any[] },
-  vouchersLoading: boolean;
+  vouchersStatus: Status;
   vouchersNextPage: { "active": number | null, "redeemed": number | null, "expired": number | null },
+  // orders
+  orders: any[],
+  ordersStatus: Status;
+  ordersNextPage: number | null;
 }
 
 const initialState: ProfileState = {
@@ -28,14 +34,19 @@ const initialState: ProfileState = {
   favNextPage: null,
   // reviews
   reviews: [],
-  reviewsLoading: false,
+  reviewsStatus: "idle",
   reviewsNextPage: null,
   // footprint
   footprint: null,
+  footprintStatus: "idle",
   // vouchers
   vouchers: { "active": [], "redeemed": [], "expired": [] },
-  vouchersLoading: false,
+  vouchersStatus: "idle",
   vouchersNextPage: { "active": null, "redeemed": null, "expired": null },
+  // orders
+  orders: [],
+  ordersStatus: "idle",
+  ordersNextPage: null
 };
 
 export const getUserProfile = createAsyncThunk(
@@ -87,6 +98,17 @@ export const getUserProfileVouchers = createAsyncThunk(
   }
 );
 
+export const getUserProfileOrders = createAsyncThunk(
+  'getUserProfileOrders',
+  async (params: any, { getState }) => {
+    const { isInit } = params;
+    const state = getState() as any;
+    const nextPage = state.profile.ordersNextPage;
+    const response = await getUserProfileOrdersApi((isInit || nextPage == null) ? 1 : nextPage);
+    return { response, isInit };
+  }
+);
+
 export const profileSlice = createSlice({
   name: 'profile',
   initialState,
@@ -94,6 +116,12 @@ export const profileSlice = createSlice({
     clearUserProfile: (state) => {
       state.data = null;
     },
+    resetUserProfileStatus: (state) => {
+      state.reviewsStatus = "idle";
+      state.footprintStatus = "idle";
+      state.vouchersStatus = "idle";
+      state.ordersStatus = "idle";
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -119,10 +147,10 @@ export const profileSlice = createSlice({
         }
       })
       .addCase(getUserProfileReviews.pending, (state) => {
-        state.reviewsLoading = true;
+        state.reviewsStatus = "loading";
       })
       .addCase(getUserProfileReviews.fulfilled, (state, action) => {
-        state.reviewsLoading = false;
+        state.reviewsStatus = action.payload.response.isSuccess ? "success" : "failed";
         if (action.payload.response.isSuccess) {
           state.reviewsNextPage = action.payload.response.nextPage;
           if (action.payload.isInit)
@@ -131,19 +159,22 @@ export const profileSlice = createSlice({
             state.reviews = state.reviews.concat(action.payload.response.data);
         }
       })
+      // footpring
       .addCase(getUserProfileFootprint.pending, (state) => {
-        // state.status = 'loading';
+        state.footprintStatus = "loading";
       })
       .addCase(getUserProfileFootprint.fulfilled, (state, action) => {
+        state.footprintStatus = action.payload.response.isSuccess ? "success" : "failed";
         if (action.payload.response.isSuccess) {
           state.footprint = action.payload.response.data;
         }
       })
+      // vouchers
       .addCase(getUserProfileVouchers.pending, (state) => {
-        state.vouchersLoading = true;
+        state.vouchersStatus = "loading";
       })
       .addCase(getUserProfileVouchers.fulfilled, (state, action) => {
-        state.vouchersLoading = false;
+        state.vouchersStatus = action.payload.response.isSuccess ? "success" : "failed";
         if (action.payload.response.isSuccess) {
           const type = action.payload.type;
           state.vouchersNextPage[type] = action.payload.response.nextPage;
@@ -151,6 +182,20 @@ export const profileSlice = createSlice({
             state.vouchers[type] = action.payload.response.data;
           else
             state.vouchers[type] = state.vouchers[type].concat(action.payload.response.data);
+        }
+      })
+      // orders
+      .addCase(getUserProfileOrders.pending, (state) => {
+        state.ordersStatus = "loading";
+      })
+      .addCase(getUserProfileOrders.fulfilled, (state, action) => {
+        state.ordersStatus = action.payload.response.isSuccess ? "success" : "failed";
+        if (action.payload.response.isSuccess) {
+          state.ordersNextPage = action.payload.response.nextPage;
+          if (action.payload.isInit)
+            state.orders = action.payload.response.data;
+          else
+            state.orders = state.orders.concat(action.payload.response.data);
         }
       })
   },
@@ -162,9 +207,8 @@ export const getUserProfileAll = (): AppThunk => (
 ) => {
   dispatch(getUserProfile());
   dispatch(getUserProfileFav({ isInit: true }));
-  dispatch(getUserProfileReviews({ isInit: true }));
 };
 
-export const { clearUserProfile } = profileSlice.actions;
+export const { clearUserProfile, resetUserProfileStatus } = profileSlice.actions;
 
 export default profileSlice.reducer;

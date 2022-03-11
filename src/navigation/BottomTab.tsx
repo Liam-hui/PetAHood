@@ -3,21 +3,22 @@ import { View, Image, TouchableOpacity, ImageSourcePropType } from 'react-native
 import { createBottomTabNavigator, BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { SafeAreaInsetsContext } from 'react-native-safe-area-context';
 import { useTranslation } from "react-i18next";
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useNavigation } from '@react-navigation/native';
+import FastImage from 'react-native-fast-image';
+
 import { getHomePageData } from '@/store/homePageData';
 import { initShopSearch } from '@/store/shopSearch';
 import { clearUserProfile, getUserProfile } from '@/store/profile';
+import { clearPetProfile } from '@/store/pets';
 import { refreshToken, resetAuth } from '@/store/auth';
 import { getAllResources } from '@/store/resources';
-
 import { Text } from '@/components/Themed';
 import HomeScreen from '../screens/HomeScreen';
 import WishlistScreen from '../screens/WishlistScreen';
 import TabTwoScreen from '../screens/TabTwoScreen';
 import { useAppDispatch, useAppSelector } from '@/hooks';
 import { RootState } from '@/store';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useNavigation } from '@react-navigation/native';
-import FastImage from 'react-native-fast-image';
 
 const BottomTab = createBottomTabNavigator();
 
@@ -32,6 +33,9 @@ const BottomTabNavigator = () => {
     if (authStatus == "success") {
       dispatch(refreshToken());
     }
+    else {
+      dispatch(resetAuth());
+    }
     dispatch(getAllResources());
     dispatch(getHomePageData());
     dispatch(initShopSearch());
@@ -44,6 +48,7 @@ const BottomTabNavigator = () => {
     }
     else {
       dispatch(clearUserProfile());
+      dispatch(clearPetProfile());
     }
 
     // show popup if need login again
@@ -154,9 +159,9 @@ const ProfileIcon = () => {
       }}
     >
       <FastImage 
-        style={{ width: 72, height: 72, borderRadius: 36, borderWidth: 2, borderColor: "white", overflow: "hidden", backgroundColor: "black", transform: [{ translateY: -4 }] }}
+        style={{ width: 72, height: 72, borderRadius: 36, borderWidth: 2, borderColor: "white", overflow: "hidden", backgroundColor: "#AAAAAA", transform: [{ translateY: -4 }] }}
         resizeMode="cover"
-        source={{ uri: authStatus == "success" && profile != null ? profile.profile_photo_url : "" }} 
+        source={authStatus == "success" && profile != null ? { uri: profile.profile_photo_url } : require("@/assets/icons/icon-user.png")} 
       />
     </TouchableOpacity>
   );

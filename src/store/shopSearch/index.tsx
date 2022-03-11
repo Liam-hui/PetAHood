@@ -185,11 +185,11 @@ export const shopSearchSlice = createSlice({
       })
       .addCase(getShopSearchResultNextPage.fulfilled, (state, action) => {
         if (action.payload.response.isSuccess) {
-          state.status = 'success';
-          if (state.nextPage == null || action.payload.response.nextPage == state.nextPage + 1) {
+          // if (state.nextPage == null || action.payload.response.nextPage == state.nextPage + 1) {
             state.result = state.result.concat(action.payload.response.result);
             state.nextPage = action.payload.response.nextPage;
-          }
+          // }
+          state.status = 'success';
         }
         else {
           state.status = 'failed';

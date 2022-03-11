@@ -22,7 +22,7 @@ export default function Loading() {
       fadeAnim,
       {
         toValue: isVisible ? 1 : 0,
-        duration: 500,
+        duration: 300,
         useNativeDriver: false,
       }
     ).start(({ finished }) => {

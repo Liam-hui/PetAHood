@@ -10,7 +10,7 @@ export default function TabBar(props: any) {
 
   return (
     <View 
-      style={{ flexDirection: 'row', justifyContent: "center", opacity: isReady ? 1 : 0 }}
+      style={{ flexDirection: 'row', justifyContent: props.isCenter ? "center" : "flex-start", opacity: isReady ? 1 : 0 }}
       {...props.isCenter && {
         onLayout: (event: any) => {
           setIsReady(true);
